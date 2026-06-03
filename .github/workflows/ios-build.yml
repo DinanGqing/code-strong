@@ -1,0 +1,178 @@
+name: iOS Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: '构建类型'
+        required: true
+        type: choice
+        default: 'sideloadly'
+        options:
+          - sideloadly
+          - ad-hoc
+          - app-store
+          - development
+      version:
+        description: '版本号（如 1.0.1）'
+        required: false
+        type: string
+
+jobs:
+  build:
+    name: Build IPA
+    runs-on: macos-latest
+
+    steps:
+      # ── 1. 检出代码 ──
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # ── 2. Node.js ──
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # ── 3. 构建前端 ──
+      - name: Build web app
+        run: npm run build
+
+      # ── 4. 同步 iOS ──
+      - name: Cap sync iOS
+        run: npx cap sync ios
+
+      # ── 5. 设置版本号 ──
+      - name: Set version
+        if: ${{ github.event.inputs.version != '' }}
+        run: |
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString ${{ github.event.inputs.version }}" \
+            ios/App/App/Info.plist
+
+      # ════════════════════════════════════
+      # 分支 A：Sideloadly 模式（无需任何开发者账号）
+      # ════════════════════════════════════
+      - name: Archive (Sideloadly - unsigned)
+        if: ${{ github.event.inputs.build_type == 'sideloadly' }}
+        run: |
+          xcodebuild archive \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -archivePath ios/build/App.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Export IPA (Sideloadly)
+        if: ${{ github.event.inputs.build_type == 'sideloadly' }}
+        run: |
+          /usr/libexec/PlistBuddy -c "Clear dict" ios/ExportOptions.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :method string development" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :signingStyle string manual" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :teamID string 0000000000" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles dict" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :provisioningProfiles:com.codestrong.app string placeholder" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :compileBitcode bool false" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :stripSwiftSymbols bool true" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :uploadBitcode bool false" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :uploadSymbols bool false" ios/ExportOptions.plist
+
+          xcodebuild -exportArchive \
+            -archivePath ios/build/App.xcarchive \
+            -exportPath ios/build \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -allowProvisioningUpdates 2>&1 || true
+
+          # Fallback: 如果直接导出失败，从 xcarchive 里提取 .app 打包成 IPA
+          if [ ! -f ios/build/App.ipa ]; then
+            echo "Direct export failed, building IPA from xcarchive..."
+            mkdir -p ios/build/Payload
+            cp -R ios/build/App.xcarchive/Products/Applications/App.app ios/build/Payload/
+            cd ios/build && zip -qr App.ipa Payload && cd ../..
+            rm -rf ios/build/Payload
+            echo "Unsigned IPA built from xcarchive."
+          fi
+
+          echo "=== IPA size ==="
+          ls -lh ios/build/App.ipa 2>/dev/null || echo "IPA not found, but might still work"
+
+      # ════════════════════════════════════
+      # 分支 B：付费开发者账号签名（需 Secrets）
+      # ════════════════════════════════════
+      - name: Setup App Store Connect API Key
+        if: ${{ github.event.inputs.build_type != 'sideloadly' }}
+        env:
+          API_KEY_BASE64: ${{ secrets.APPSTORE_CONNECT_API_KEY_BASE64 }}
+          KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
+        run: |
+          mkdir -p ~/private_keys
+          echo "$API_KEY_BASE64" | base64 -d > ~/private_keys/AuthKey_${KEY_ID}.p8
+
+      - name: Generate ExportOptions (Signed)
+        if: ${{ github.event.inputs.build_type != 'sideloadly' }}
+        env:
+          BUILD_TYPE: ${{ github.event.inputs.build_type }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          case "$BUILD_TYPE" in
+            app-store) METHOD="app-store"; CERT="Apple Distribution" ;;
+            ad-hoc)    METHOD="ad-hoc";    CERT="Apple Distribution" ;;
+            *)         METHOD="development"; CERT="Apple Development" ;;
+          esac
+          /usr/libexec/PlistBuddy -c "Clear dict" ios/ExportOptions.plist 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :method string $METHOD" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :signingStyle string automatic" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :teamID string $TEAM_ID" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :signingCertificate string $CERT" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :uploadBitcode bool false" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :uploadSymbols bool true" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :compileBitcode bool false" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :stripSwiftSymbols bool true" ios/ExportOptions.plist
+          /usr/libexec/PlistBuddy -c "Add :destination string export" ios/ExportOptions.plist
+
+      - name: Archive (Signed)
+        if: ${{ github.event.inputs.build_type != 'sideloadly' }}
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
+        run: |
+          xcodebuild archive \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -archivePath ios/build/App.xcarchive \
+            -destination "generic/platform=iOS" \
+            -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
+            -authenticationKeyID ${KEY_ID} \
+            -authenticationKeyIssuerID ${ISSUER_ID} \
+            -allowProvisioningUpdates
+
+      - name: Export IPA (Signed)
+        if: ${{ github.event.inputs.build_type != 'sideloadly' }}
+        env:
+          KEY_ID: ${{ secrets.APPSTORE_CONNECT_KEY_ID }}
+          ISSUER_ID: ${{ secrets.APPSTORE_CONNECT_ISSUER_ID }}
+        run: |
+          xcodebuild -exportArchive \
+            -archivePath ios/build/App.xcarchive \
+            -exportPath ios/build \
+            -exportOptionsPlist ios/ExportOptions.plist \
+            -authenticationKeyPath ~/private_keys/AuthKey_${KEY_ID}.p8 \
+            -authenticationKeyID ${KEY_ID} \
+            -authenticationKeyIssuerID ${ISSUER_ID} \
+            -allowProvisioningUpdates
+
+      # ── 上传 IPA ──
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: 码坚强-${{ github.event.inputs.build_type }}-${{ github.sha }}
+          path: ios/build/App.ipa
+          retention-days: 90

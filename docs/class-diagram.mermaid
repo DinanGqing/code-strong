@@ -1,0 +1,33 @@
+classDiagram
+    class users {
+        +INTEGER id PK
+        +TEXT username UNIQUE
+        +TEXT email UNIQUE
+        +TEXT password_hash
+        +TEXT avatar
+        +TEXT bio
+        +TEXT created_at
+    }
+
+    class tools {
+        +INTEGER id PK
+        +TEXT name
+        +TEXT description
+        +TEXT category
+        +TEXT tags
+        +INTEGER download_count
+        +INTEGER author_id FK
+        +TEXT created_at
+        +TEXT updated_at
+    }
+
+    class community_activities {
+        +INTEGER id PK
+        +TEXT username
+        +TEXT action
+        +TEXT target
+        +TEXT tag
+        +TEXT created_at
+    }
+
+    users "1" -- "0..*" tools : author_id

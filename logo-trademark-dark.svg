@@ -1,0 +1,37 @@
+<svg viewBox="0 0 800 300" width="800" height="300" xmlns="http://www.w3.org/2000/svg">
+  <title>码坚强 CODE STRONG 品牌标识 — 暗色底</title>
+  <rect x="0" y="0" width="800" height="300" fill="#0a0a1a" rx="8"/>
+  
+  <defs>
+    <style>
+      .brand-cn { font: 800 52px system-ui, -apple-system, sans-serif; fill: #fff; letter-spacing: 8px; }
+      .brand-code { font: 800 42px system-ui, -apple-system, sans-serif; fill: #EEEDFE; letter-spacing: 3px; }
+      .brand-strong { font: 800 42px system-ui, -apple-system, sans-serif; fill: #AFA9EC; letter-spacing: 3px; }
+      .brand-tag { font: 500 13px system-ui, -apple-system, sans-serif; fill: rgba(255,255,255,0.35); letter-spacing: 3px; }
+      .brand-note { font: 400 9px system-ui, -apple-system, sans-serif; fill: rgba(255,255,255,0.25); }
+    </style>
+  </defs>
+
+  <g transform="translate(80, 60)">
+    <g id="icon">
+      <path d="M 26 98 L 74 48 L 26 -2" fill="none" stroke="#AFA9EC" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+      <path d="M 74 48 L 26 98 L 74 148" fill="none" stroke="#AFA9EC" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+      <rect x="85" y="42" width="34" height="10" rx="5" fill="#CECBF6" opacity="0.9"/>
+      <rect x="26" y="158" width="93" height="6" rx="3" fill="#7F77DD" opacity="0.35"/>
+    </g>
+    <g transform="translate(160, 15)">
+      <text x="0" y="0" class="brand-cn">码坚强</text>
+      <text x="0" y="46" class="brand-code">CODE</text>
+      <text x="0" y="84" class="brand-strong">STRONG</text>
+      <line x1="0" y1="102" x2="220" y2="102" stroke="#AFA9EC" stroke-width="2" opacity="0.6"/>
+      <text x="0" y="124" class="brand-tag">AI AGENT DEVELOPER COMMUNITY</text>
+      <circle cx="6" cy="140" r="4" fill="#534AB7" opacity="0.9"/>
+      <circle cx="18" cy="140" r="4" fill="#7F77DD" opacity="0.85"/>
+      <circle cx="30" cy="140" r="4" fill="#AFA9EC" opacity="0.8"/>
+      <circle cx="42" cy="140" r="4" fill="#CECBF6" opacity="0.7"/>
+      <circle cx="54" cy="140" r="4" fill="#D8D4F4" opacity="0.6"/>
+      <circle cx="66" cy="140" r="4" fill="#EEEDFE" opacity="0.5"/>
+    </g>
+    <text x="0" y="210" class="brand-note">暗色底版本 · 码坚强 (Code Strong) · AI Agent Developer Community</text>
+  </g>
+</svg>

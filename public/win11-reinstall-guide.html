@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🪟 Windows 11 全新安装教程 — U盘官方原版</title>
+<style>
+  :root {
+    --bg: #0a0a1a;
+    --card: rgba(18,18,42,0.85);
+    --accent: #0078D4;
+    --accent2: #00D4FF;
+    --green: #00FF41;
+    --purple: #9B59B6;
+    --gold: #FFD700;
+    --warn: #FF6B35;
+    --text: #e0e0e0;
+    --muted: rgba(255,255,255,0.5);
+    --border: rgba(255,255,255,0.08);
+    --code-bg: #0d1117;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    font-family:'PingFang SC','Microsoft YaHei','Segoe UI',sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.8; min-height:100vh;
+  }
+  #matrix-bg{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.04}
+
+  .page{position:relative;z-index:1;max-width:840px;margin:0 auto;padding:60px 24px 80px}
+
+  /* Hero */
+  .hero{text-align:center;padding:48px 0 40px}
+  .hero-icon{font-size:4rem;display:block;margin-bottom:16px;animation:float 3s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .hero h1{font-size:1.85rem;font-weight:800;letter-spacing:-0.02em;line-height:1.3;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+    margin-bottom:12px}
+  .hero p{color:var(--muted);font-size:1.05rem;max-width:550px;margin:0 auto;line-height:1.6}
+  .hero .meta{display:flex;justify-content:center;gap:24px;margin-top:24px;font-size:0.85rem;color:var(--muted);flex-wrap:wrap}
+  .hero .meta span{display:flex;align-items:center;gap:6px}
+
+  /* 通用卡片 */
+  .card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:28px 32px;margin-bottom:32px;backdrop-filter:blur(12px)
+  }
+  .card h3{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:1.15rem}
+
+  /* 准备清单 */
+  .checklist .cl-row{
+    display:flex;align-items:flex-start;gap:12px;padding:10px 0;
+    border-bottom:1px solid rgba(255,255,255,0.03)
+  }
+  .checklist .cl-row:last-child{border-bottom:none}
+  .cl-icon{font-size:1.2rem;flex-shrink:0;margin-top:2px}
+
+  /* 步骤卡片 */
+  .step-card{
+    background:var(--card);border:1px solid var(--border);border-radius:16px;
+    padding:32px;margin-bottom:32px;backdrop-filter:blur(12px);
+    border-left:4px solid var(--accent);position:relative
+  }
+  .step-num{
+    position:absolute;top:-14px;left:-14px;width:32px;height:32px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:0.85rem;color:#fff;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    box-shadow:0 4px 16px rgba(0,120,212,0.3)
+  }
+  .step-card h3{margin-bottom:8px;padding-left:12px;font-size:1.2rem}
+  .step-card .step-subtitle{
+    font-size:0.85rem;color:var(--muted);margin-bottom:20px;
+    padding:8px 16px;background:rgba(0,120,212,0.06);
+    border-radius:8px;border-left:3px solid var(--accent)
+  }
+  .step-card .step-subtitle.warn{
+    background:rgba(255,107,53,0.08);border-left-color:var(--warn)
+  }
+  .step-card p{margin-bottom:12px}
+  .step-card ul,.step-card ol{padding-left:24px;margin-bottom:12px}
+  .step-card ul li,.step-card ol li{margin-bottom:6px;color:var(--muted)}
+
+  /* 子步骤编号 */
+  .step-list{counter-reset:step;list-style:none;padding-left:0}
+  .step-list li{
+    counter-increment:step;padding:10px 0 10px 48px;position:relative;
+    border-bottom:1px solid rgba(255,255,255,0.03)
+  }
+  .step-list li:last-child{border-bottom:none}
+  .step-list li::before{
+    content:counter(step);position:absolute;left:4px;top:10px;
+    width:28px;height:28px;border-radius:50%;
+    background:rgba(0,120,212,0.12);display:flex;align-items:center;
+    justify-content:center;font-size:0.8rem;font-weight:700;color:var(--accent)
+  }
+
+  /* 代码/命令块 */
+  .code-block{
+    position:relative;margin:16px 0;border-radius:10px;overflow:hidden;
+    background:var(--code-bg);border:1px solid rgba(255,255,255,0.08)
+  }
+  .code-block .lang-tag{
+    position:absolute;top:0;right:0;padding:4px 14px;
+    font-size:0.7rem;color:var(--muted);text-transform:uppercase;
+    font-family:monospace;background:rgba(255,255,255,0.04);border-bottom-left-radius:6px
+  }
+  .code-block .copy-btn{
+    position:absolute;top:8px;right:60px;
+    background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);
+    color:var(--muted);padding:3px 10px;border-radius:5px;
+    font-size:0.75rem;cursor:pointer;transition:all 0.2s
+  }
+  .code-block .copy-btn:hover{background:rgba(0,120,212,0.15);color:var(--accent2)}
+  .code-block pre{
+    margin:0;padding:24px;overflow-x:auto;
+    font-family:'Consolas','Courier New',monospace;
+    font-size:0.88rem;line-height:1.7;color:#c9d1d9
+  }
+  code{
+    background:rgba(0,120,212,0.1);color:var(--accent2);
+    padding:2px 8px;border-radius:4px;font-family:'Consolas','Courier New',monospace;font-size:0.9em
+  }
+
+  /* 表格 */
+  .styled-table{width:100%;border-collapse:collapse;margin:16px 0}
+  .styled-table th{
+    text-align:left;padding:12px 16px;background:rgba(0,120,212,0.06);
+    color:var(--accent2);font-weight:600;font-size:0.85rem
+  }
+  .styled-table td{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.9rem}
+  .styled-table tr:hover td{background:rgba(0,120,212,0.03)}
+  .styled-table a{color:var(--accent2);text-decoration:none}
+  .styled-table a:hover{text-decoration:underline}
+
+  /* 警告框 */
+  .alert{
+    padding:14px 20px;border-radius:10px;margin:16px 0;font-size:0.9rem;
+    border:1px solid rgba(255,107,53,0.2);background:rgba(255,107,53,0.06);color:var(--warn)
+  }
+  .alert.info{border-color:rgba(0,120,212,0.2);background:rgba(0,120,212,0.06);color:var(--accent2)}
+
+  /* 终端输出 */
+  .terminal-out{
+    background:var(--code-bg);border:1px solid rgba(255,255,255,0.06);
+    border-radius:10px;padding:16px 20px;margin:12px 0;
+    font-family:'Consolas','Courier New',monospace;
+    font-size:0.85rem;color:var(--muted);line-height:1.6;overflow-x:auto
+  }
+
+  /* FAQ */
+  .faq-card .faq-item{
+    margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.04)
+  }
+  .faq-card .faq-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+  .faq-card .q{font-weight:700;color:var(--accent2);margin-bottom:8px;display:flex;align-items:flex-start;gap:8px}
+  .faq-card .a{color:var(--muted);padding-left:32px}
+
+  /* 清单 */
+  .checklist-grid{display:grid;grid-template-columns:1fr;gap:8px}
+  .cl-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:rgba(0,120,212,0.04);font-size:0.9rem}
+  .cl-item .box{width:18px;height:18px;border-radius:4px;border:2px solid rgba(255,255,255,0.15);flex-shrink:0}
+
+  /* 结尾 */
+  .ending{text-align:center;padding:48px 0}
+  .ending .emoji{font-size:3rem;display:block;margin-bottom:12px}
+  .ending h2{font-size:1.6rem;font-weight:800;margin-bottom:12px}
+  .ending .note{
+    margin-top:20px;padding:16px 24px;border-radius:12px;
+    border:1px solid rgba(0,255,65,0.2);background:rgba(0,255,65,0.04);
+    color:var(--green);font-size:0.85rem;display:inline-block
+  }
+
+  @media(max-width:640px){
+    .page{padding:32px 16px 60px}
+    .hero h1{font-size:1.3rem}
+    .step-card,.card{padding:24px 18px}
+    .code-block pre{padding:16px;font-size:0.8rem}
+    .styled-table{font-size:0.8rem}
+  }
+</style>
+</head>
+<body>
+
+<!-- 顶部导航条 -->
+<nav style="position:sticky;top:0;z-index:100;background:rgba(10,10,26,0.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 28px;display:flex;align-items:center;gap:16px;font-family:'PingFang SC','Microsoft YaHei',sans-serif;">
+  <a href="/" style="display:flex;align-items:center;gap:6px;color:#00D4FF;text-decoration:none;font-weight:600;font-size:0.92rem;transition:color 0.2s;" onmouseover="this.style.color='#9B59B6'" onmouseout="this.style.color='#00D4FF'">
+    <span style="font-size:1.1rem;">←</span> 返回首页
+  </a>
+  <span style="color:rgba(255,255,255,0.15);">|</span>
+  <span style="color:rgba(255,255,255,0.45);font-size:0.85rem;">码坚强 · 教程</span>
+</nav>
+
+<canvas id="matrix-bg"></canvas>
+
+<div class="page">
+
+  <section class="hero">
+    <span class="hero-icon">🪟</span>
+    <h1>Windows 11 全新安装教程</h1>
+    <p>U盘安装 &middot; 官方原版 &middot; 零成本<br>电脑卡慢？中毒？换硬盘？彻底重装一台干净的系统</p>
+    <div class="meta">
+      <span>⏱ 下载 1~2h + 安装 30min</span>
+      <span>🔧 需 ≥8GB U盘</span>
+      <span>🆓 完全免费</span>
+    </div>
+  </section>
+
+  <!-- 准备 -->
+  <section class="card checklist">
+    <h3>1️⃣ 准备工作</h3>
+    <div class="cl-row"><span class="cl-icon">💾</span><span>一个 <strong>8GB 或以上</strong> 的 U盘（建议 USB 3.0，速度快很多）</span></div>
+    <div class="cl-row"><span class="cl-icon">⚠️</span><span>备份好 U盘里的文件（制作启动盘会<strong>清空所有数据</strong>）</span></div>
+    <div class="cl-row"><span class="cl-icon">📁</span><span>备份电脑上重要的文件（重装系统会清空 C 盘）</span></div>
+    <div class="cl-row"><span class="cl-icon">🌐</span><span>品牌机（联想/华为/戴尔等）先去官网下载好<strong>网卡驱动</strong>备用</span></div>
+  </section>
+
+  <!-- 步骤2: 下载ISO -->
+  <div class="step-card">
+    <div class="step-num">2</div>
+    <h3>下载官方 Windows 11 ISO</h3>
+    <div class="step-subtitle">微软官方渠道 — 正版无毒，完全免费</div>
+    <p><strong>推荐方法：用微软官方下载工具（最简单）</strong></p>
+    <ol class="step-list">
+      <li>打开浏览器，访问微软官方下载页面：<br><code>https://www.microsoft.com/zh-cn/software-download/windows11</code></li>
+      <li>拉到页面，找到 <strong>"创建 Windows 11 安装媒体"</strong> 板块</li>
+      <li>点击 <strong>"立即下载"</strong>，下载 <code>mediacreationtool.exe</code></li>
+      <li>运行工具 → 选语言和版本 → 选 <strong>"U盘"</strong> → 选你的 U盘 → 等待下载完成</li>
+    </ol>
+    <div class="alert info">✅ 工具自动从微软服务器下载最新官方 ISO — 正版、无毒、无捆绑</div>
+    <p style="margin-top:16px"><strong>备选方法：手动下载 ISO</strong><br>同样页面往下翻，找到 <strong>"下载 Windows 11 磁盘映像 (ISO)"</strong> → 下载 <code>Win11_xxxx.iso</code>（5~6GB）</p>
+  </div>
+
+  <!-- 步骤3: 制作启动U盘 -->
+  <div class="step-card">
+    <div class="step-num">3</div>
+    <h3>制作启动 U盘</h3>
+    <div class="step-subtitle">方式一（推荐）：mediacreationtool 一键完成，无需额外操作</div>
+    <p><strong>方式二：如果你下载了 ISO 文件，用 Rufus 写盘</strong></p>
+    <ol class="step-list">
+      <li>下载 <strong>Rufus</strong>（免费开源）：<a href="https://rufus.ie/zh_CN.html" target="_blank" style="color:var(--accent2)">rufus.ie/zh_CN.html</a></li>
+      <li>插入 U盘 → 打开 Rufus</li>
+      <li>设备选择你的 U盘，引导类型 →<strong>"选择"</strong> → 找到 ISO 文件</li>
+      <li>其他保持默认 → 点击 <strong>"开始"</strong></li>
+      <li>等待进度条走完（约 5-15 分钟）</li>
+    </ol>
+    <div class="alert info">💡 老电脑没有 TPM 2.0？Rufus 弹出选项时勾上 <strong>"绕过 TPM 检查"</strong></div>
+  </div>
+
+  <!-- 步骤4: BIOS启动 -->
+  <div class="step-card">
+    <div class="step-num">4</div>
+    <h3>设置 BIOS 从 U盘启动</h3>
+    <div class="step-subtitle">把 U盘插到要重装的电脑上 → 重启 → 开机时疯狂按对应键</div>
+    <table class="styled-table">
+      <tr><th>品牌</th><th>启动菜单键</th><th>BIOS 设置键</th></tr>
+      <tr><td>联想</td><td>F12</td><td>F1 / F2</td></tr>
+      <tr><td>华硕</td><td>ESC</td><td>F2 / Del</td></tr>
+      <tr><td>戴尔</td><td>F12</td><td>F2</td></tr>
+      <tr><td>惠普</td><td>F9</td><td>ESC / F10</td></tr>
+      <tr><td>华为</td><td>F12</td><td>F2</td></tr>
+      <tr><td>小米</td><td>F12</td><td>F2</td></tr>
+      <tr><td>神舟</td><td>F7</td><td>F2</td></tr>
+      <tr><td>组装机</td><td>F11 / F12</td><td>Del</td></tr>
+    </table>
+    <p style="margin-top:12px">在 Boot Menu 里选择你的 U盘（会显示品牌名或 <code>USB HDD</code>）→ 回车</p>
+    <span style="color:var(--green);font-weight:600">✅ 屏幕变黑 → 出现 Windows 标志 → U盘启动成功！</span>
+  </div>
+
+  <!-- 步骤5: 安装 -->
+  <div class="step-card">
+    <div class="step-num">5</div>
+    <h3>安装 Windows 11</h3>
+    <div class="step-subtitle">进入蓝色安装界面后，按步骤走</div>
+    <ol class="step-list">
+      <li>语言、时间、键盘 → 都选 <strong>简体中文 / 中国</strong> → 下一步</li>
+      <li>点击 <strong>"现在安装"</strong></li>
+      <li>激活 → 点 <strong>"我没有产品密钥"</strong>（装完再激活也可以）</li>
+      <li>选版本 → <strong>Windows 11 专业版</strong> 或 <strong>家庭版</strong> → 下一步</li>
+      <li>勾选 <strong>"我接受许可条款"</strong> → 下一步</li>
+      <li><strong style="color:var(--warn)">⚠️ 选 "自定义：仅安装 Windows（高级）"</strong></li>
+    </ol>
+
+    <h3 style="font-size:1.05rem;margin-top:20px">⚠️ 分区操作</h3>
+    <table class="styled-table">
+      <tr><th>场景</th><th>操作方法</th></tr>
+      <tr>
+        <td style="white-space:nowrap">全新安装</td>
+        <td>选中 C 盘分区 → <strong>删除</strong> → 小分区也一样 → 选 <strong>"未分配的空间"</strong> → <strong>新建</strong> → 下一步</td>
+      </tr>
+      <tr>
+        <td style="white-space:nowrap">保留 D 盘</td>
+        <td>只删除 ESP 分区（100-300MB）和 C 盘，<strong>不要动 D 盘</strong></td>
+      </tr>
+    </table>
+    <div class="alert">⚠️ 看不懂的分区不要乱删，搞错了数据就没了。</div>
+    <p style="margin-top:12px">系统开始复制文件 → 安装 10~20 分钟 → 电脑会重启几次 → <strong>不要动它</strong></p>
+  </div>
+
+  <!-- 步骤6: 首次设置 -->
+  <div class="step-card">
+    <div class="step-num">6</div>
+    <h3>首次开机设置</h3>
+    <div class="step-subtitle">电脑重启后进入 OOBE（首次设置向导）</div>
+    <ol class="step-list">
+      <li>选 <strong>中国</strong> → <strong>微软拼音</strong> → 是</li>
+      <li>键盘布局 → <strong>跳过</strong></li>
+      <li>连接网络（如卡住：左下角点 <strong>"我没有 Internet 连接"</strong>）</li>
+      <li>给电脑命名</li>
+      <li>登录微软账户（想跳过：输入 <code>test@test.com</code> 会退回离线账户）</li>
+      <li>设置 <strong>PIN 码</strong>（登录密码）</li>
+      <li>隐私设置 → 全点 <strong>"否"</strong></li>
+    </ol>
+    <span style="color:var(--green);font-weight:600">✅ 等待进入桌面 — 完成！</span>
+  </div>
+
+  <!-- FAQ -->
+  <section class="card faq-card">
+    <h3>❓ 常见问题</h3>
+    <div class="faq-item">
+      <div class="q">Q：装完后要激活吗？</div>
+      <div class="a">品牌机（之前自带正版 Win10/11）装完联网后<strong>自动激活</strong>。没激活的话：设置→系统→激活→疑难解答。同一台机器硬件授权绑定，<strong>不要再花钱买新密钥</strong>。</div>
+    </div>
+    <div class="faq-item">
+      <div class="q">Q：装完没网怎么办？</div>
+      <div class="a">网卡驱动没装上。用另一台电脑去品牌官网下载网卡驱动→U盘拷过来装；或用手机 USB 共享网络让 Windows 自动更新驱动。</div>
+    </div>
+    <div class="faq-item">
+      <div class="q">Q：可以保留我的文件吗？</div>
+      <div class="a">菜单有"保留个人文件"选项，但<strong>不建议选</strong>——保留会把旧问题也带过来。彻底清空重新来体验最好。</div>
+    </div>
+    <div class="faq-item">
+      <div class="q">Q：装完后如何打驱动？</div>
+      <div class="a">Win11 联网后自动更新大部分驱动。不放心的话：设备管理器→右键有问号的设备→更新驱动；或用品牌官方工具（联想电脑管家、华硕 MyASUS 等）。</div>
+    </div>
+  </section>
+
+  <!-- 总结清单 -->
+  <section class="card">
+    <h3>✅ 总结清单</h3>
+    <div class="checklist-grid">
+      <div class="cl-item"><span class="box"></span>U盘 ≥8GB 已备份</div>
+      <div class="cl-item"><span class="box"></span>微软官网下载工具</div>
+      <div class="cl-item"><span class="box"></span>制作启动 U盘</div>
+      <div class="cl-item"><span class="box"></span>备份个人文件</div>
+      <div class="cl-item"><span class="box"></span>进 BIOS 选 U盘启动</div>
+      <div class="cl-item"><span class="box"></span>完成安装 + 进入桌面</div>
+      <div class="cl-item"><span class="box"></span>联网 + 自动激活</div>
+    </div>
+  </section>
+
+  <section class="ending">
+    <span class="emoji">🎉</span>
+    <h2>搞定！一台全新的 Windows 11</h2>
+    <p style="color:var(--muted)">干净、流畅、无捆绑</p>
+    <div class="note">
+      📌 本教程全部使用微软官方工具和开源软件（Rufus）<br>
+      全程<strong>无第三方站点、无破解工具、无需花一分钱</strong>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+  var c=document.getElementById('matrix-bg'),ctx=c.getContext('2d');
+  var chars='01アイウエオカキクケコ',fs=13,cols,rows,drops=[];
+  function R(){
+    c.width=window.innerWidth;c.height=window.innerHeight;
+    cols=Math.floor(c.width/fs)+1;rows=Math.floor(c.height/fs)+1;
+    drops=[];for(var i=0;i<cols;i++)drops[i]=Math.floor(Math.random()*rows)
+  }
+  R();window.addEventListener('resize',R);
+  function D(){
+    ctx.fillStyle='rgba(10,10,26,0.06)';ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#0078D4';ctx.font=fs+'px monospace';
+    for(var i=0;i<drops.length;i++){
+      ctx.fillText(chars[Math.floor(Math.random()*chars.length)],i*fs,drops[i]*fs);
+      if(drops[i]*fs>c.height&&Math.random()>0.975)drops[i]=0;drops[i]++
+    }
+  }
+  setInterval(D,60)
+})();
+function copyCode(b,t){
+  navigator.clipboard.writeText(t).then(function(){
+    b.textContent='✅ 已复制';setTimeout(function(){b.textContent='📋 复制'},2000)
+  })
+}
+</script>
+
+<!-- 底部 -->
+<footer style="margin-top:64px;padding:32px 24px;border-top:1px solid rgba(255,255,255,0.06);background:rgba(10,10,26,0.6);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);font-family:'PingFang SC','Microsoft YaHei',sans-serif;text-align:center;">
+  <a href="https://workbuddy.cn" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;font-size:1.05rem;font-weight:600;color:#00D4FF;text-decoration:none;margin-bottom:12px;transition:all 0.3s;" onmouseover="this.style.color='#9B59B6'" onmouseout="this.style.color='#00D4FF'">
+    🦾 技术支持：WorkBuddy
+  </a>
+  <p style="color:rgba(255,255,255,0.35);font-size:0.85rem;max-width:500px;margin:0 auto 12px;line-height:1.6;">
+    WorkBuddy 是新一代 AI 桌面助手，为码坚强社区提供全方位的技术支持。从这里出发，让 AI 成为你的超能力！
+  </p>
+  <p style="color:rgba(255,255,255,0.2);font-size:0.75rem;margin-bottom:8px;">
+    &copy; 2026 码坚强社区 &middot; AI Agent Developer Community
+  </p>
+  <a href="https://beian.miit.gov.cn" target="_blank" rel="noopener" style="font-size:0.7rem;color:rgba(255,255,255,0.18);text-decoration:none;transition:color 0.3s;" onmouseover="this.style.color='rgba(255,255,255,0.4)'" onmouseout="this.style.color='rgba(255,255,255,0.18)'">
+    赣ICP备2025060250号-2
+  </a>
+</footer>
+
+</body>
+</html>

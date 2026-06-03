@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- 导出方式：app-store / ad-hoc / enterprise / development -->
+	<key>method</key>
+	<string>app-store</string>
+
+	<!-- 是否上传 App Store 的位码 -->
+	<key>uploadBitcode</key>
+	<false/>
+
+	<!-- 是否上传 App Store 的符号表 -->
+	<key>uploadSymbols</key>
+	<true/>
+
+	<!-- 自动管理签名 -->
+	<key>signingStyle</key>
+	<string>automatic</string>
+
+	<!-- 自动签名时使用的团队 ID -->
+	<!-- 替换为你的 Team ID -->
+	<key>teamID</key>
+	<string>YOUR_TEAM_ID_HERE</string>
+
+	<!-- 自动签名时使用的证书类型 -->
+	<key>signingCertificate</key>
+	<string>Apple Distribution</string>
+
+	<!-- 描述文件 -->
+	<!-- 在 Xcode 中勾选 "Automatically manage signing" 后可留空 -->
+	<key>provisioningProfiles</key>
+	<dict>
+		<key>com.codestrong.app</key>
+		<string>YOUR_PROFILE_NAME_HERE</string>
+	</dict>
+
+	<!-- 压缩方式 -->
+	<key>compileBitcode</key>
+	<false/>
+
+	<!-- 去除 Swift 符号 -->
+	<key>stripSwiftSymbols</key>
+	<true/>
+
+	<!-- iCloud 容器环境 -->
+	<key>iCloudContainerEnvironment</key>
+	<string>Production</string>
+
+	<!-- 目标设备 -->
+	<key>destination</key>
+	<string>export</string>
+
+	<!-- 分发 Bundle -->
+	<key>distributionBundleIdentifier</key>
+	<string>com.codestrong.app</string>
+</dict>
+</plist>

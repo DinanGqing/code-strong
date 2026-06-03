@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全局基础样式 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background-color: #0a0a1a;
+  color: #e0e0e0;
+  min-height: 100vh;
+  /* 全面屏安全区域适配 */
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  overflow-x: hidden;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0a0a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #00B4D8;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #00D4FF;
+}
+
+/* 玻璃态卡片 */
+@layer components {
+  .glass-card {
+    @apply rounded-xl border border-white/10;
+    background: rgba(18, 18, 42, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300;
+  }
+
+  .glass-card-hover:hover {
+    border-color: rgba(0, 212, 255, 0.6);
+    box-shadow: 0 8px 32px rgba(0, 180, 216, 0.25), 0 0 60px rgba(0, 180, 216, 0.1);
+    background: rgba(0, 180, 216, 0.12) !important;
+  }
+
+  .glass-card-hover:hover .MuiTypography-root {
+    transition: color 0.3s ease;
+  }
+
+  /* 标题文字变亮青色 */
+  .glass-card-hover:hover h5, .glass-card-hover:hover h6 {
+    color: #fff !important;
+  }
+
+  /* 描述文字变白 */
+  .glass-card-hover:hover .MuiTypography-body1,
+  .glass-card-hover:hover .MuiTypography-body2 {
+    color: rgba(255, 255, 255, 0.85) !important;
+  }
+
+  .gradient-btn {
+    @apply px-6 py-2 rounded-lg font-medium text-white transition-all duration-300;
+    background: linear-gradient(135deg, #00B4D8, #9B59B6);
+  }
+
+  .gradient-btn:hover {
+    background: linear-gradient(135deg, #00D4FF, #B07CD8);
+    box-shadow: 0 4px 20px rgba(0, 180, 216, 0.4);
+    transform: translateY(-2px);
+  }
+
+  .gradient-text {
+    background: linear-gradient(135deg, #00D4FF, #9B59B6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .section-title {
+    @apply text-3xl font-bold text-center mb-10;
+    background: linear-gradient(135deg, #00D4FF, #9B59B6);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    line-height: 1.35;
+    padding-bottom: 0.15em;
+  }
+}
+
+/* ===== 卡片追光 + 3D 倾斜 ===== */
+.glow-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.1s ease;
+  transform: perspective(600px) rotateX(var(--rotate-x, 0deg)) rotateY(var(--rotate-y, 0deg));
+  border-radius: 12px;
+}
+
+.glow-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: var(--glow-opacity, 0);
+  transition: opacity 0.15s ease;
+  background: radial-gradient(
+    circle 160px at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.2),
+    rgba(0, 212, 255, 0.18) 30%,
+    rgba(0, 180, 216, 0.08) 60%,
+    transparent
+  );
+  pointer-events: none;
+}
+
+/* 边框辉光 — 更明显的视觉反馈 */
+.glow-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  opacity: var(--glow-opacity, 0);
+  transition: opacity 0.15s ease;
+  border-radius: 13px;
+  background: radial-gradient(
+    circle 200px at var(--mx, 50%) var(--my, 50%),
+    rgba(0, 212, 255, 0.3),
+    transparent 70%
+  );
+  padding: 1px;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}

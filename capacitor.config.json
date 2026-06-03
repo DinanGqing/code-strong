@@ -1,0 +1,20 @@
+{
+  "appId": "com.zhimaquan.app",
+  "appName": "智码圈",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "https",
+    "iosScheme": "capacitor"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": true,
+    "webContentsDebuggingEnabled": false
+  },
+  "ios": {
+    "contentInset": "automatic",
+    "preferredContentMode": "mobile",
+    "allowsLinkPreview": true,
+    "scrollEnabled": true
+  }
+}

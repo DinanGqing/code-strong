@@ -1,0 +1,13 @@
+<svg viewBox="0 0 512 512" width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <title>码坚强 图标 — App / Favicon 专用</title>
+  <rect x="0" y="0" width="512" height="512" fill="#0a0a1a" rx="96"/>
+  <!-- V 形 prompt mark，坐标预缩放 2.5x，居中，无 transform -->
+  <!-- 左腿：从底到顶的 V 左半边 -->
+  <path d="M 140 298 L 260 174 L 140 49" fill="none" stroke="#AFA9EC" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  <!-- 右腿：从顶到底的 V 右半边（半透明，形成折叠/对勾效果） -->
+  <path d="M 260 174 L 140 298 L 260 424" fill="none" stroke="#AFA9EC" stroke-width="25" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"/>
+  <!-- 右侧短横条：prompt 光标/输入提示 -->
+  <rect x="287" y="159" width="85" height="25" rx="12" fill="#CECBF6" opacity="0.9"/>
+  <!-- 底部横线：基座/下划线 -->
+  <rect x="140" y="449" width="233" height="15" rx="7" fill="#7F77DD" opacity="0.35"/>
+</svg>

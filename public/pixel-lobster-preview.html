@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>🦞 像素龙虾预览</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#0a0a1a;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;font-family:'PingFang SC','Microsoft YaHei',sans-serif;color:#e0e0e0;gap:24px}
+  h2{background:linear-gradient(135deg,#FF6B35,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-size:1.5rem}
+  .scene{display:flex;gap:40px;flex-wrap:wrap;justify-content:center;align-items:flex-end}
+  .card{background:rgba(18,18,42,0.85);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;text-align:center;backdrop-filter:blur(12px)}
+  .card h3{margin-bottom:12px;font-size:0.9rem;color:rgba(255,255,255,0.5)}
+  canvas{image-rendering:pixelated;border-radius:8px}
+  .label{margin-top:8px;font-size:0.75rem;color:rgba(255,255,255,0.35)}
+  .note{font-size:0.8rem;color:rgba(255,255,255,0.3);margin-top:16px;max-width:500px;text-align:center;line-height:1.6}
+</style>
+</head>
+<body>
+<h2>🦞 强壮龙虾 · 像素精灵预览</h2>
+<div class="scene">
+  <div class="card">
+    <h3>待机（带眨眼）</h3>
+    <canvas id="c1" width="192" height="192"></canvas>
+    <div class="label">3× 放大</div>
+  </div>
+  <div class="card">
+    <h3>攻击姿态</h3>
+    <canvas id="c2" width="192" height="192"></canvas>
+    <div class="label">3× 放大</div>
+  </div>
+  <div class="card">
+    <h3>走路循环</h3>
+    <canvas id="c3" width="192" height="192"></canvas>
+    <div class="label">3× 放大</div>
+  </div>
+</div>
+<p class="note">原始尺寸 64×64px · 这里放大 3× 展示</p>
+<p class="note">🦞 设计理念：宽厚躯干 + 巨大双钳 + 霸气站姿 + 像素铠甲纹路</p>
+
+<script>
+// ===== 调色板 =====
+const T = null; // 透明
+const O = '#1a0505'; // 最深轮廓
+const D = '#4a1010'; // 深红暗部
+const B = '#881818'; // 身体基色
+const R = '#cc2222'; // 鲜红本体
+const H = '#ee4444'; // 高光红
+const C = '#d43525'; // 钳子红
+const L = '#ff6644'; // 钳子亮面
+const W = '#ffffff'; // 白眼
+const K = '#111111'; // 黑瞳
+const G = '#888888'; // 灰色（关节/钳刃）
+const Y = '#ffcc33'; // 金色高光
+
+// ===== 龙虾精灵数据 64×64 =====
+// 每行是一个字符串，每个字符对应上面的颜色变量
+const SPRITE_IDLE = [
+  //  0         1         2         3         4         5         6
+  //  0123456789012345678901234567890123456789012345678901234567890123
+  '                                                              ', // 0
+  '                                                              ', // 1
+  '                        TT         TT                         ', // 2  触须尖
+  '                       TTTT       TTTT                        ', // 3
+  '                        TTBBBBBBBBBBTT                        ', // 4  触须基部
+  '                     TTTTBBBBBBBBBBBBTTTT                     ', // 5
+  '            TTTT   TTTTTTBBTTTTTTTTBBTTTTTT   TTTT            ', // 6
+  '           TTTTTTTTTTTTTTTTT    TTTTTTTTTTTTTTTTTTT           ', // 7  钳子上方
+  '          TTTCCCCCCCCCCCTTTTT  TTTTTCCCCCCCCCCCTTTT          ', // 8  左钳         右钳
+  '         TTCCCCCCCCCCCCCTTTTTTTTTTTCCCCCCCCCCCCCTTTT         ', // 9
+  '        TTCCCCCCLLLLLCCCTTTTBBTTTTCCCCCCLLLLLCCCTTTT        ', // 10
+  '        TCCCCCLLLLLLLCCCTTTBBBBTTTCCCCCLLLLLLLCCCTTT        ', // 11
+  '       TCCCCCLLLLLLLLLCCTTTBBBBTTTCCCCCLLLLLLLLLCCTTT       ', // 12
+  '       TCCCCCCLLLLLLCCCTTTBBBBBBTTTCCCCCCLLLLLLCCCTTT       ', // 13
+  '       TTCCCCCCCCCCCTTTTBBBBBBBBBBTTTCCCCCCCCCCCTTTTT       ', // 14
+  '        TTTCCCCCCCTTTTBBBBBBBBBBBBBBTTTCCCCCCCTTTTTT        ', // 15
+  '        TTTTTTTT   TTBBBBBBBBBBBBBBBBTT   TTTTTTTTTT        ', // 16  钳子底部
+  '                 TTTBBBBBBBBBBBBBBBBBBTTT                     ', // 17
+  '                TTBBBBBRRRRRRRRRRRRRRBBBBTT                   ', // 18  身体上缘
+  '              TTBBBRRRRRRRRRRRRRRRRRRRRRRBBTT                 ', // 19
+  '             TBBBRRRRRRRRRRRRRRRRRRRRRRRRRRBBT                ', // 20
+  '            TBBBRRRRRWWBBBBBBBBBBBBBBWWRRRRRRBBT              ', // 21  眼睛（白）
+  '           TBBBRRRRRWKBBBBBBBBBBBBBBBBKWRRRRRRBBT             ', // 22  眼睛（瞳）
+  '           TBBBRRRRRRWBBBBBBBBBBBBBBBBWRRRRRRRBBT             ', // 23
+  '          TBBBRRRRRRRBBBBBB        BBBBBRRRRRRRBBT            ', // 24
+  '          TBBBRRRRRRBBBY            YBBBRRRRRRRBBT            ', // 25  金色眼睛纹
+  '         TBBBRRRRRRBBGGGGG      GGGGGBBRRRRRRRBBT            ', // 26
+  '         TBBBRRRRRRBBGGGGGGGGGGGGGGGGBBRRRRRRRBBT            ', // 27  喉甲
+  '         TBBBRRRRRRBBGGGGGGGGGGGGGGGGBBRRRRRRRBBT            ', // 28
+  '         TBBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRRBBT            ', // 29  胸甲
+  '         TTBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRBBTT            ', // 30
+  '          TBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRBBT             ', // 31
+  '          TBBBRRRRRRBBRRRRRRRRRRRRRRRBBBRRRRRRBT             ', // 32
+  '           TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT             ', // 33
+  '           TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT             ', // 34  腹甲
+  '            TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT              ', // 35
+  '            TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT              ', // 36
+  '             TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT               ', // 37
+  '             TBBBRRRRRRRRRRRRRRRRRRRRRRRRRRBBT               ', // 38
+  '              TBBRRRRRRRRRRRRRRRRRRRRRRRRRRBT                ', // 39
+  '              TBBBRRRRRRRRRRRRRRRRRRRRRRRRBBT                ', // 40
+  '              TTBBRRRRRRRRRRRRRRRRRRRRRRRRBBTT               ', // 41
+  '               TBBBRRRRRRRRRRRRRRRRRRRRRRBBBT                ', // 42
+  '               TTBBRRYYYYYYYYYYYYYYYYYYRRBBTT                ', // 43  金色腹纹
+  '                TBBBRRYYYYYYYYYYYYYYYYRRBBBT                 ', // 44
+  '                TTBBRRBBTTTTTTTTTTTTTTRRBBTT                 ', // 45
+  '                 TBBBRRTT    TT    TTRRBBBT                  ', // 46
+  '                 TBBBTTT    TTTT    TTTBBBT                  ', // 47
+  '                 TTBBTT    TTTTTT    TTBBTT                  ', // 48  尾节1
+  '                 TBBTT     TTTTTT     TTBBT                  ', // 49
+  '                 TBBT      TTTTTT      TBBT                  ', // 50
+  '                TTBBT     TTTTTTTT     TBBTT                 ', // 51  尾节2
+  '                TBBTT    TTTTTTTTTT    TTBBT                 ', // 52
+  '                TBBTT   TTTTTTTTTTTT   TTBBT                 ', // 53
+  '               TBBTT   TTTTTTTTTTTTTT   TTBBT                ', // 54  尾节3
+  '               TBBT    TTTTTTTTTTTTTT    TBBT                ', // 55
+  '               TBBT  TTTTTTTTTTTTTTTTTT  TBBT                ', // 56  尾扇展开
+  '              TTBBTTTTTTTTTTTTTTTTTTTTTTTTTBBTT              ', // 57
+  '              TTTTBBBBTTTTTTTTTTTTTTTTTBBBBTTTT              ', // 58  腿基
+  '              TTRRRRTT    TTTTTTTT    TTRRRRTT              ', // 59  腿
+  '              TTRRRRTT    TTTTTTTT    TTRRRRTT              ', // 60
+  '             TTBBRRTT     TTTTTTTT     TTBBRRTT             ', // 61
+  '             TTBBRRTT     TTTTTTTT     TTBBRRTT             ', // 62
+  '             TTTTTTTT     TTTTTTTT     TTTTTTTT             ', // 63  足底
+];
+
+// 攻击姿态：钳子更大更夸张
+const SPRITE_ATTACK = [
+  '                                                              ','                                                              ',
+  '                        TT         TT                         ','                       TTTT       TTTT                        ',
+  '                        TTBBBBBBBBBBTT                        ','                     TTTTBBBBBBBBBBBBTTTT                     ',
+  '            TTTT   TTTTTTBBTTTTTTTTBBTTTTTT   TTTT            ','           TTTTTTTTTTTTTTTTT    TTTTTTTTTTTTTTTTTTT           ',
+  '         TTCCCCCCCCCCCCTTTTT    TTTTTCCCCCCCCCCCCCTTT         ',
+  '        TTCCCCCCCCCCCCCTTTTTTTTTTTTCCCCCCCCCCCCCCCTTTT       ',
+  '       TCCCCCCLLLLLLLCCTTTBBBBTTTCCCCCCLLLLLLLCCCCTTT        ',
+  '       TCCCCCLLLLLLLLLCCTTTBBBBTTCCCCCCLLLLLLLLLCCCTTT       ',
+  '      TCCCCCLLLLLLLLLLLCCTBBBBBBTCCCCLLLLLLLLLLLLCCCTT       ',
+  '      TCCCCCCCLLLLLLLLCCCTBBBBBBBCLLLLLLLLLLLLCCCCCTTT       ',
+  '      TTCCCCCCCCCCCCCCTTTBBBBBBBBBBTTCCCCCCCCCCCCCTTT        ',
+  '       TTTCCCCCCCCCCCTTTBBBBBBBBBBBBBTCCCCCCCCCTTTTT         ',
+  '        TTTTTTTT    TTBBBBBBBBBBBBBBBBTT    TTTTTTTT          ',
+  '                 TTTBBBBBBBBBBBBBBBBBBTTT                      ',
+  '                TTBBBBBRRRRRRRRRRRRRRBBBBTT                    ',
+  '              TTBBBRRRRRRRRRRRRRRRRRRRRRRBBTT                  ',
+  '             TBBBRRRRRRRRRRRRRRRRRRRRRRRRRRBBT                 ',
+  '            TBBBRRRRRWWBBBBBBBBBBBBBBWWRRRRRRBBTT              ',
+  '           TBBBRRRRRWKBBBBBBBBBBBBBBBBKWRRRRRRBBTT             ',
+  '           TBBBRRRRRRWBBBBBBBBBBBBBBBBWRRRRRRRBBTT             ',
+  '          TBBBRRRRRRRBBBBBB        BBBBBRRRRRRRBBTT            ',
+  '          TBBBRRRRRBBBBY  YYYY  YY  YBBBRRRRRRRBBTT            ',
+  '         TBBBRRRRRBBGGGGG GGGG GGGGGGGBBRRRRRRRBBTT           ',
+  '         TBBBRRRRRBBGGGGGGGGGGGGGGGGGGBBRRRRRRRBBTT           ',
+  '         TBBBRRRRRBBGGGGGGGGGGGGGGGGGGBBRRRRRRRBBTT           ',
+  '         TBBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRRBBTT           ',
+  '         TTBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRBBTT            ',
+  '          TBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRBBT             ',
+  '          TBBBRRRRRRBBRRRRRRRRRRRRRRRBBBRRRRRRBT             ',
+  '           TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT             ',
+  '           TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT             ',
+  '            TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT              ',
+  '            TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT              ',
+  '             TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT               ',
+  '             TBBBRRRRRRRRRRRRRRRRRRRRRRRRRRBBT               ',
+  '              TBBRRRRRRRRRRRRRRRRRRRRRRRRRRBT                ',
+  '              TBBBRRRRRRRRRRRRRRRRRRRRRRRRBBT                ',
+  '              TTBBRRRRRRRRRRRRRRRRRRRRRRRRBBTT               ',
+  '               TBBBRRRRRRRRRRRRRRRRRRRRRRBBBT                ',
+  '               TTBBRRYYYYYYYYYYYYYYYYYYRRBBTT                ',
+  '                TBBBRRYYYYYYYYYYYYYYYYRRBBBT                 ',
+  '                TTBBRRBBTTTTTTTTTTTTTTRRBBTT                 ',
+  '                 TBBBRRTT    TT    TTRRBBBT                  ',
+  '                 TBBBTTT    TTTT    TTTBBBT                  ',
+  '                 TTBBTT    TTTTTT    TTBBTT                  ',
+  '                 TBBTT     TTTTTT     TTBBT                  ',
+  '                 TBBT      TTTTTT      TBBT                  ',
+  '                TTBBT     TTTTTTTT     TBBTT                 ',
+  '                TBBTT    TTTTTTTTTT    TTBBT                 ',
+  '                TBBTT   TTTTTTTTTTTT   TTBBT                 ',
+  '               TBBTT   TTTTTTTTTTTTTT   TTBBT                ',
+  '               TBBT    TTTTTTTTTTTTTT    TBBT                ',
+  '               TBBT  TTTTTTTTTTTTTTTTTT  TBBT                ',
+  '              TTBBTTTTTTTTTTTTTTTTTTTTTTTTTBBTT              ',
+  '              TTTTBBBBTTTTTTTTTTTTTTTTTBBBBTTTT              ',
+  '              TTRRRRTT    TTTTTTTT    TTRRRRTT              ',
+  '              TTRRRRTT    TTTTTTTT    TTRRRRTT              ',
+  '             TTBBRRTT     TTTTTTTT     TTBBRRTT             ',
+  '             TTBBRRTT     TTTTTTTT     TTBBRRTT             ',
+  '             TTTTTTTT     TTTTTTTT     TTTTTTTT             ',
+];
+
+// 走路帧1 - 右脚前
+const SPRITE_WALK1 = [
+  '                                                              ','                                                              ',
+  '                        TT         TT                         ','                       TTTT       TTTT                        ',
+  '                        TTBBBBBBBBBBTT                        ','                     TTTTBBBBBBBBBBBBTTTT                     ',
+  '            TTTT   TTTTTTBBTTTTTTTTBBTTTTTT   TTTT            ','           TTTTTTTTTTTTTTTTT    TTTTTTTTTTTTTTTTTTT           ',
+  '          TTTCCCCCCCCCCCTTTTT  TTTTTCCCCCCCCCCCTTTT          ',
+  '         TTCCCCCCCCCCCCCTTTTTTTTTTTCCCCCCCCCCCCCTTTT         ',
+  '        TTCCCCCCLLLLLCCCTTTTBBTTTTCCCCCCLLLLLCCCTTTT        ',
+  '        TCCCCCLLLLLLLCCCTTTBBBBTTTCCCCCLLLLLLLCCCTTT        ',
+  '       TCCCCCLLLLLLLLLCCTTTBBBBTTTCCCCCLLLLLLLLLCCTTT       ',
+  '       TCCCCCCLLLLLLCCCTTTBBBBBBTTTCCCCCCLLLLLLCCCTTT       ',
+  '       TTCCCCCCCCCCCTTTTBBBBBBBBBBTTTCCCCCCCCCCCTTTTT       ',
+  '        TTTCCCCCCCTTTTBBBBBBBBBBBBBBTTTCCCCCCCTTTTTT        ',
+  '        TTTTTTTT   TTBBBBBBBBBBBBBBBBTT   TTTTTTTTTT        ',
+  '                 TTTBBBBBBBBBBBBBBBBBBTTT                     ',
+  '                TTBBBBBRRRRRRRRRRRRRRBBBBTT                   ',
+  '              TTBBBRRRRRRRRRRRRRRRRRRRRRRBBTT                 ',
+  '             TBBBRRRRRRRRRRRRRRRRRRRRRRRRRRBBT                ',
+  '            TBBBRRRRRWWBBBBBBBBBBBBBBWWRRRRRRBBTT              ',
+  '           TBBBRRRRRWKBBBBBBBBBBBBBBBBKWRRRRRRBBTT             ',
+  '           TBBBRRRRRRWBBBBBBBBBBBBBBBBWRRRRRRRBBTT             ',
+  '          TBBBRRRRRRRBBBBBB        BBBBBRRRRRRRBBTT            ',
+  '          TBBBRRRRRRBBBY            YBBBRRRRRRRBBTT            ',
+  '         TBBBRRRRRRBBGGGGG      GGGGGBBRRRRRRRBBTT            ',
+  '         TBBBRRRRRRBBGGGGGGGGGGGGGGGGBBRRRRRRRBBTT            ',
+  '         TBBBRRRRRRBBGGGGGGGGGGGGGGGGBBRRRRRRRBBTT            ',
+  '         TBBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRRBBTT            ',
+  '         TTBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRBBTT            ',
+  '          TBBRRRRRRBBBRRRRRRRRRRRRRRBBBRRRRRRBBT             ',
+  '          TBBBRRRRRRBBRRRRRRRRRRRRRRRBBBRRRRRRBT             ',
+  '           TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT             ',
+  '           TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT             ',
+  '            TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT              ',
+  '            TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT              ',
+  '             TBBRRRRRRRRRRRRRRRRRRRRRRRRRRRBBT               ',
+  '             TBBBRRRRRRRRRRRRRRRRRRRRRRRRRRBBT               ',
+  '              TBBRRRRRRRRRRRRRRRRRRRRRRRRRRBT                ',
+  '              TBBBRRRRRRRRRRRRRRRRRRRRRRRRBBT                ',
+  '              TTBBRRRRRRRRRRRRRRRRRRRRRRRRBBTT               ',
+  '               TBBBRRRRRRRRRRRRRRRRRRRRRRBBBT                ',
+  '               TTBBRRYYYYYYYYYYYYYYYYYYRRBBTT                ',
+  '                TBBBRRYYYYYYYYYYYYYYYYRRBBBT                 ',
+  '                TTBBRRBBTTTTTTTTTTTTTTRRBBTT                 ',
+  '                 TBBBRRTT    TT    TTRRBBBT                  ',
+  '                 TBBBTTT    TTTT    TTTBBBT                  ',
+  '                 TTBBTT    TTTTTT    TTBBTT                  ',
+  '                 TBBTT     TTTTTT     TTBBT                  ',
+  '                 TBBT      TTTTTT      TBBT                  ',
+  '                TTBBTT    TTTTTTTT    TTBBTT                 ',
+  '               TTTBTT    TTTTTTTTTT   TTTTBTT                ',
+  '               TTBBTT   TTTTTTTTTTTT   TTBBTT                ',
+  '              TTBBTT   TTTTTTTTTTTTTT   TTBBTT               ',
+  '             TTBBTT   TTTTTTTTTTTTTTTT   TTBBTT              ',
+  '             TTBBT  TTTTTTTTTTTTTTTTTTTT  TBBTT              ',
+  '            TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT            ',
+  '            TTTTBBBBTTTTTTTTTTTTTTTTTBBBBTTTTTT             ',
+  '             TTRRRRTT     TTTTTTTT     TTRRRRTT             ',
+  '             TTRRRRTT     TTTTTTTT     TTRRRRTT             ',
+  '            TTBBRRTT      TTTTTTTT      TTBBRRTT            ',
+  '           TTBBRRTT       TTTTTTTT       TTBBRRTT           ',
+  '           TTTTTTT        TTTTTTTT        TTTTTTT           ',
+];
+
+
+// ===== 绘制函数 =====
+function drawSprite(ctx, sprite, ox, oy, scale, blink) {
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  
+  for (let y = 0; y < 64; y++) {
+    const row = sprite[y];
+    if (!row) continue;
+    for (let x = 0; x < 64; x++) {
+      const c = row[x];
+      let color = null;
+      switch (c) {
+        case 'O': color = '#1a0505'; break;
+        case 'D': color = '#4a1010'; break;
+        case 'B': color = '#881818'; break;
+        case 'R': color = '#cc2222'; break;
+        case 'H': color = '#ee4444'; break;
+        case 'C': color = '#d43525'; break;
+        case 'L': color = '#ff6644'; break;
+        case 'W': 
+          color = blink ? '#dddddd' : '#ffffff'; 
+          break; // 眨眼时白眼变灰
+        case 'K': 
+          color = blink ? '#444444' : '#111111'; 
+          break; // 眨眼时黑瞳变大
+        case 'G': color = '#888888'; break;
+        case 'Y': color = '#ffcc33'; break;
+        case ' ': case 'T': continue;
+      }
+      if (color) {
+        ctx.fillStyle = color;
+        ctx.fillRect(ox + x * scale, oy + y * scale, scale, scale);
+      }
+    }
+  }
+  
+  // 眼白覆盖（眨眼动画）
+  if (blink) {
+    // 在眼睛位置画一条水平线模拟闭眼
+    const eyeY = oy + 21 * scale;
+    const eyeLX = ox + 17 * scale;
+    const eyeRX = ox + 41 * scale;
+    ctx.fillStyle = '#cc2222'; // 身体色
+    [eyeLX, eyeRX].forEach(ex => {
+      ctx.fillRect(ex, eyeY + scale, scale * 7, scale, scale);
+      ctx.fillRect(ex - scale, eyeY + scale*2, scale * 9, scale, scale);
+    });
+  }
+}
+
+// ===== 动画循环 =====
+const c1 = document.getElementById('c1');
+const c2 = document.getElementById('c2');
+const c3 = document.getElementById('c3');
+const ctx1 = c1.getContext('2d');
+const ctx2 = c2.getContext('2d');
+const ctx3 = c3.getContext('2d');
+
+const SCALE = 3;
+const OX = (192 - 64*SCALE) / 2;
+const OY = (192 - 64*SCALE) / 2;
+
+let frame = 0;
+let walkFrame = 0;
+
+function animate() {
+  frame++;
+  
+  // 待机：每120帧眨眼一次
+  const blink = (frame % 120) > 115;
+  drawSprite(ctx1, SPRITE_IDLE, OX, OY, SCALE, blink);
+  
+  // 攻击姿态：钳子张合
+  const attackIntensity = Math.sin(frame * 0.05) * 0.5 + 0.5;
+  ctx2.save();
+  drawSprite(ctx2, SPRITE_ATTACK, OX, OY, SCALE, false);
+  // 攻击姿态钳子抖动
+  ctx2.globalAlpha = 0.15;
+  ctx2.fillStyle = '#ff6644';
+  // 左钳高光闪烁
+  ctx2.fillRect(OX + 4*SCALE, OY + 9*SCALE, SCALE*6, SCALE);
+  ctx2.fillRect(OX + 52*SCALE, OY + 9*SCALE, SCALE*6, SCALE);
+  ctx2.restore();
+  
+  // 走路循环
+  walkFrame = (walkFrame + 1) % 40;
+  const walkSprite = walkFrame < 20 ? SPRITE_WALK1 : SPRITE_IDLE;
+  const bobY = Math.sin(walkFrame / 20 * Math.PI) * 2; // 上下弹跳
+  drawSprite(ctx3, walkSprite, OX, OY + bobY, SCALE, (frame % 120) > 115);
+  
+  requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+</body>
+</html>

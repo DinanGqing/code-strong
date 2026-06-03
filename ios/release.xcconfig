@@ -1,0 +1,20 @@
+// ============================================
+// 码坚强 iOS Release 签名配置
+// 在 macOS 上构建前，请填入你的 Apple Developer 信息
+// ============================================
+
+// 开发团队 ID（在 developer.apple.com → Membership 中查看）
+// 格式：10位字母数字组合，如 ABC123DEF4
+// DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE
+
+// 签名证书名称（在钥匙串中查看）
+// 开发证书：iPhone Developer: Your Name (XXXXXXXXXX)
+// 发布证书：iPhone Distribution: Your Name (XXXXXXXXXX)
+// CODE_SIGN_IDENTITY = iPhone Distribution
+
+// 描述文件名称（在 developer.apple.com → Profiles 中查看）
+// PROVISIONING_PROFILE_SPECIFIER = Your Profile Name
+
+// 建议：首次构建用 Automatic 签名（需 Xcode 中登录 Apple ID）
+// 后续发布再用 Manual 指定证书
+CODE_SIGN_STYLE = Automatic
