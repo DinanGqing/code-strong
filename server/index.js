@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { initDatabase } from './db/database.js';
+import { initDatabase, getDatabase } from './db/database.js';
 import { runSeed } from './db/seed.js';
 import authRoutes from './routes/auth.js';
 import toolsRoutes from './routes/tools.js';
@@ -37,6 +37,16 @@ async function start() {
   });
   app.use(cors());
   app.use(express.json());
+
+  // 社区统计数据（实时）
+  app.get('/api/stats', function(_req, res) {
+    const db = getDatabase();
+    const userCount = db.prepare('SELECT COUNT(*) as cnt FROM users').get().cnt;
+    const toolCount = db.prepare('SELECT COUNT(*) as cnt FROM tools').get().cnt;
+    const activityCount = db.prepare('SELECT COUNT(*) as cnt FROM community_activities').get().cnt;
+    const agentCount = 9;
+    res.json({ code: 0, data: { users: userCount, tools: toolCount, skills: activityCount, agents: agentCount } });
+  });
 
   // 路由挂载
   app.use('/api/auth', authRoutes);

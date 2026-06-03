@@ -216,8 +216,7 @@ export default function Agents() {
                 {selectedAgent.description}
               </Typography>
 
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 3 }}>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 3 }}>
                 {selectedAgent.tags.map((tag, i) => (
                   <Chip
                     key={i}

@@ -1,7 +1,9 @@
-import { Container, Box, Typography, Card, CardContent, CardActionArea, Grid, Chip } from '@mui/material';
+import { Container, Box, Typography, Card, CardContent, CardActionArea, Grid, Chip, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import HeroBanner from '../components/HeroBanner';
 import useCardGlow from '../hooks/useCardGlow';
+import client from '../api/client';
 import BuildIcon from '@mui/icons-material/Build';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import StorefrontIcon from '@mui/icons-material/Storefront';
@@ -66,6 +68,13 @@ function formatTime(isoStr) {
  */
 export default function Home() {
   const navigate = useNavigate();
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    client.get('/api/stats').then(res => {
+      if (res.data?.code === 0) setStats(res.data.data);
+    }).catch(() => {});
+  }, []);
 
   return (
     <Box>
@@ -112,10 +121,10 @@ export default function Home() {
       <Container maxWidth="lg" sx={{ mb: 8 }}>
         <Grid container spacing={3}>
           {[
-            { icon: <GroupsIcon />, value: '成长中', label: '社区成员', color: '#00D4FF' },
-            { icon: <BuildIcon />, value: '持续增加', label: '技能模板', color: '#9B59B6' },
-            { icon: <StorefrontIcon />, value: '持续增加', label: '开源工具', color: '#FFD700' },
-            { icon: <EmojiEventsIcon />, value: '9+', label: '精选Agent', color: '#00FF88' },
+            { icon: <GroupsIcon />, value: stats ? stats.users.toLocaleString() : '...', label: '社区成员', color: '#00D4FF' },
+            { icon: <BuildIcon />, value: stats ? stats.skills.toLocaleString() : '...', label: '社区动态', color: '#9B59B6' },
+            { icon: <StorefrontIcon />, value: stats ? stats.tools.toLocaleString() : '...', label: '开源工具', color: '#FFD700' },
+            { icon: <EmojiEventsIcon />, value: stats ? stats.agents.toLocaleString() : '...', label: '精选Agent', color: '#00FF88' },
           ].map((stat, i) => (
             <Grid item xs={6} md={3} key={i}>
               <GlowCard sx={{ borderRadius: '12px' }}>
