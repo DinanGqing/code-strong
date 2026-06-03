@@ -124,7 +124,7 @@ export default function Home() {
             { icon: <GroupsIcon />, value: stats ? stats.users.toLocaleString() : '...', label: '社区成员', color: '#00D4FF' },
             { icon: <BuildIcon />, value: stats ? stats.skills.toLocaleString() : '...', label: '社区动态', color: '#9B59B6' },
             { icon: <StorefrontIcon />, value: stats ? stats.tools.toLocaleString() : '...', label: '开源工具', color: '#FFD700' },
-            { icon: <EmojiEventsIcon />, value: stats ? stats.agents.toLocaleString() : '...', label: '精选Agent', color: '#00FF88' },
+            { icon: <EmojiEventsIcon />, value: 'WorkBuddy', label: '精选Agent', color: '#00FF88' },
           ].map((stat, i) => (
             <Grid item xs={6} md={3} key={i}>
               <GlowCard sx={{ borderRadius: '12px' }}>
