@@ -112,10 +112,10 @@ export default function Home() {
       <Container maxWidth="lg" sx={{ mb: 8 }}>
         <Grid container spacing={3}>
           {[
-            { icon: <GroupsIcon />, value: '50,000+', label: '社区成员', color: '#00D4FF' },
-            { icon: <BuildIcon />, value: '3,200+', label: '技能模板', color: '#9B59B6' },
-            { icon: <StorefrontIcon />, value: '860+', label: '开源工具', color: '#FFD700' },
-            { icon: <EmojiEventsIcon />, value: '120+', label: '精选Agent', color: '#00FF88' },
+            { icon: <GroupsIcon />, value: '成长中', label: '社区成员', color: '#00D4FF' },
+            { icon: <BuildIcon />, value: '持续增加', label: '技能模板', color: '#9B59B6' },
+            { icon: <StorefrontIcon />, value: '持续增加', label: '开源工具', color: '#FFD700' },
+            { icon: <EmojiEventsIcon />, value: '9+', label: '精选Agent', color: '#00FF88' },
           ].map((stat, i) => (
             <Grid item xs={6} md={3} key={i}>
               <GlowCard sx={{ borderRadius: '12px' }}>

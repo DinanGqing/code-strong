@@ -321,7 +321,7 @@ export default function Skills() {
                         gap: 0.5,
                       }}
                     >
-                      👥 {skill.users.toLocaleString()} 人已使用 · 点击生成模板 →
+                      📋 点击生成模板 →
                     </Typography>
                   </Tooltip>
                 </CardContent>

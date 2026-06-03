@@ -94,19 +94,10 @@ export default function Agents() {
                     >
                       {agent.name}
                     </Typography>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
-                      <Rating
-                        value={agent.rating}
-                        precision={0.1}
-                        readOnly
-                        size="small"
-                        sx={{
-                          '& .MuiRating-iconFilled': { color: '#FFD700' },
-                        }}
-                      />
-                      <Typography variant="caption" sx={{ color: '#FFD700', fontWeight: 600 }}>
-                        {agent.rating}
-                      </Typography>
+                    <Box sx={{ display: 'flex', gap: 0.5, mt: 0.5, flexWrap: 'wrap' }}>
+                      {agent.tags.slice(0, 2).map((tag, i) => (
+                        <Chip key={i} label={tag} size="small" sx={{ fontSize: '0.7rem', height: 20 }} />
+                      ))}
                     </Box>
                   </Box>
                 </Box>
@@ -147,7 +138,7 @@ export default function Agents() {
                 >
                   <Typography variant="caption" sx={{ color: 'text.secondary', display: 'flex', alignItems: 'center', gap: 0.5 }}>
                     <TrendingUpIcon sx={{ fontSize: 14 }} />
-                    {agent.users} 用户
+                    查看详情
                   </Typography>
                   <Button
                     size="small"
@@ -226,20 +217,7 @@ export default function Agents() {
               </Typography>
 
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                <Box>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>评分</Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Rating value={selectedAgent.rating} precision={0.1} readOnly sx={{ '& .MuiRating-iconFilled': { color: '#FFD700' } }} />
-                    <Typography sx={{ color: '#FFD700', fontWeight: 600 }}>{selectedAgent.rating}</Typography>
-                  </Box>
-                </Box>
-                <Box>
-                  <Typography variant="body2" sx={{ color: 'text.secondary', mb: 0.5 }}>用户数</Typography>
-                  <Typography sx={{ fontWeight: 600, color: '#00D4FF' }}>{selectedAgent.users}</Typography>
-                </Box>
-              </Box>
-
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 3 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 3 }}>
                 {selectedAgent.tags.map((tag, i) => (
                   <Chip
                     key={i}
