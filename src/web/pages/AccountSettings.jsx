@@ -203,7 +203,7 @@ export default function AccountSettings() {
         </DialogActions>
       </Dialog>
 
-      <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast({ ...toast, open: false })} anchorOrigin={{ vertical: 'top', horizontal: 'center' }}><Alert severity={toast.severity} onClose={() => setToast({ ...toast, open: false })} variant="filled">{toast.message}</Alert></Snackbar>
+      <Snackbar open={toast.open} autoHideDuration={3000} onClose={() => setToast({ ...toast, open: false })} anchorOrigin={{ vertical: 'center', horizontal: 'center' }}><Alert severity={toast.severity} onClose={() => setToast({ ...toast, open: false })} variant="filled">{toast.message}</Alert></Snackbar>
     </Container>
   );
 }

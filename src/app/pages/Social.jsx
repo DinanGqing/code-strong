@@ -306,7 +306,7 @@ export default function Social() {
       </Dialog>
 
       <Snackbar open={toast.open} autoHideDuration={3000} onClose={function() { setToast({ ...toast, open: false }); }}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}>
+        anchorOrigin={{ vertical: 'center', horizontal: 'center' }}>
         <Alert severity={toast.severity} variant="filled">{toast.msg}</Alert>
       </Snackbar>
     </Container>

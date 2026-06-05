@@ -18,16 +18,43 @@ export default function OAuthCallback() {
   useEffect(() => {
     const mode = params.get('mode');
 
+    // 处理服务端返回的错误
+    const serverError = params.get('error');
+    if (serverError) {
+      localStorage.setItem('qq_bind_error', serverError);
+      navigate('/settings', { replace: true });
+      return;
+    }
+
+    // 处理登录模式未绑定的情况
+    const oauthError = params.get('oauth_error');
+    if (oauthError) {
+      if (oauthError === 'qq_not_bound') {
+        const msg = `QQ 账号 "${params.get('qq_nickname') || 'QQ用户'}" 未绑定任何账号，请先在账户设置中绑定`;
+        localStorage.setItem('qq_bind_error', msg);
+        navigate('/settings', { replace: true });
+      } else {
+        localStorage.setItem('qq_bind_error', oauthError);
+        navigate('/', { replace: true });
+      }
+      return;
+    }
+
     if (mode === 'bind') {
       // ====== 绑定模式 ======
       const openid = params.get('openid');
       const qqNickname = params.get('qq_nickname') || 'QQ用户';
 
+      if (!openid) {
+        localStorage.setItem('qq_bind_error', 'QQ 绑定失败：缺少用户标识');
+        navigate('/settings', { replace: true });
+        return;
+      }
+
       const doBind = async () => {
         try {
           const res = await client.post('/oauth/qq/bind', { openid, qq_nickname: qqNickname });
           if (res.code === 0) {
-            // 绑定成功，存储一个 flag 通知账户设置页刷新
             localStorage.setItem('qq_bind_success', 'true');
           } else {
             localStorage.setItem('qq_bind_error', res.message || '绑定失败');
@@ -56,7 +83,6 @@ export default function OAuthCallback() {
       }
       navigate('/', { replace: true });
     } else {
-      // 未绑定的 QQ 登录，跳转回首页
       navigate('/', { replace: true });
     }
   }, []);

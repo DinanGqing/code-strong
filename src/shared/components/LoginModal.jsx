@@ -222,7 +222,7 @@ export default function LoginModal({ open, onClose, onSwitchToRegister, onForgot
         open={toast.open}
         autoHideDuration={3000}
         onClose={() => setToast({ ...toast, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        anchorOrigin={{ vertical: 'center', horizontal: 'center' }}
       >
         <Alert
           severity={toast.severity}

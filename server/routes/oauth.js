@@ -22,6 +22,21 @@ const JWT_SECRET = process.env.JWT_SECRET || 'codestrong-secret-2024';
 const BASE_URL = process.env.BASE_URL || 'http://bitopen.online';
 const REDIRECT_QQ = `${BASE_URL}/api/oauth/qq/callback`;
 
+/**
+ * 从 QQ 的 JSONP 格式响应中安全提取 JSON 对象
+ * QQ API 的响应格式如：callback( {"key":"value"} );
+ */
+function extractQQJson(raw) {
+  if (!raw) return null;
+  const m = String(raw).match(/callback\(\s*(\{.*\})\s*\)/);
+  if (!m) return null;
+  try {
+    return JSON.parse(m[1]);
+  } catch {
+    return null;
+  }
+}
+
 // ====== QQ OAuth ======
 
 // 获取 QQ 授权 URL（支持 login / bind 两种模式）
@@ -34,16 +49,37 @@ router.get('/qq/url', (req, res) => {
   res.json({ code: 0, data: { url, state } });
 });
 
-// QQ 回调（同时处理 login 和 bind 两种模式）
+/**
+ * QQ 回调（同时处理 login 和 bind 两种模式）
+ *
+ * 流程：
+ * 1. QQ 授权后重定向到此，携带 code + state
+ * 2. 用 code 换 access_token
+ * 3. 用 access_token 换 openid
+ * 4. 获取用户信息（昵称、头像）
+ * 5. bind 模式 → 重定向到前端回调页，由前端调 bind API
+ * 6. login 模式 → 查找绑定用户，生成 JWT，重定向
+ */
 router.get('/qq/callback', async (req, res) => {
   const { code, state } = req.query;
   if (!code) return res.status(400).send('缺少 code');
 
-  // 从 state 解析模式
   const mode = state?.startsWith('bind_') ? 'bind' : 'login';
+  console.log(`[QQ Callback] mode=${mode} code=${code?.substring(0, 8)}... state=${state}`);
+
+  // 统一错误重定向：不管是哪个步骤失败，都跳转到前端
+  const redirectError = (msg) => {
+    console.error(`[QQ Callback Error] ${msg}`);
+    if (mode === 'bind') {
+      res.redirect(`${BASE_URL}/#/oauth/callback?mode=bind&error=${encodeURIComponent(msg)}`);
+    } else {
+      const errParams = new URLSearchParams({ oauth_error: msg });
+      res.redirect(`${BASE_URL}/#/?${errParams.toString()}`);
+    }
+  };
 
   try {
-    // 用 code 换 access_token
+    // ====== 第 1 步：用 code 换 access_token ======
     const tokenRes = await axios.get('https://graph.qq.com/oauth2.0/token', {
       params: {
         grant_type: 'authorization_code',
@@ -52,43 +88,83 @@ router.get('/qq/callback', async (req, res) => {
         code,
         redirect_uri: REDIRECT_QQ,
       },
+      timeout: 10000,
     });
-    const params = new URLSearchParams(tokenRes.data);
-    const accessToken = params.get('access_token');
 
-    // 获取 openid
-    const openidRes = await axios.get(`https://graph.qq.com/oauth2.0/me?access_token=${accessToken}`);
-    const jsonStr = openidRes.data.match(/callback\((.*)\)/)?.[1];
-    const { openid } = JSON.parse(jsonStr);
+    // QQ 的 token 响应可能是 URL 编码格式 (access_token=xxx&expires_in=xxx)
+    // 也可能是 JSONP 格式 (callback({"error":100005,...}))
+    const tokenRaw = tokenRes.data;
+    if (!tokenRaw) return redirectError('QQ 授权失败：空响应');
 
-    // 获取用户信息（QQ昵称+头像，供展示用）
-    const userRes = await axios.get('https://graph.qq.com/user/get_user_info', {
-      params: { access_token: accessToken, oauth_consumer_key: process.env.QQ_APPID, openid },
+    let accessToken = null;
+    if (typeof tokenRaw === 'string' && tokenRaw.includes('access_token=')) {
+      // URL 编码格式
+      const tp = new URLSearchParams(tokenRaw);
+      accessToken = tp.get('access_token');
+    } else if (typeof tokenRaw === 'string' && tokenRaw.includes('callback(')) {
+      // JSONP 格式（错误情况）
+      const json = extractQQJson(tokenRaw);
+      if (json && json.error) {
+        return redirectError(`QQ 授权失败：${json.error_description || json.error}`);
+      }
+    }
+
+    if (!accessToken) return redirectError('QQ 授权失败：无法获取 access_token');
+
+    // ====== 第 2 步：用 access_token 获取 openid ======
+    const openidRes = await axios.get('https://graph.qq.com/oauth2.0/me', {
+      params: { access_token: accessToken },
+      timeout: 10000,
     });
-    const qqUser = userRes.data;
-    const qqNickname = qqUser.nickname || 'QQ用户';
-    const qqAvatar = qqUser.figureurl_qq_2 || qqUser.figureurl_qq_1 || '';
+
+    const openidRaw = openidRes.data;
+    if (!openidRaw) return redirectError('QQ 登录失败：无法获取用户标识');
+
+    const openidJson = extractQQJson(openidRaw);
+    if (!openidJson || !openidJson.openid) {
+      return redirectError('QQ 登录失败：无效的用户标识');
+    }
+    const openid = openidJson.openid;
+    if (typeof openid !== 'string' || openid.length < 4) {
+      return redirectError('QQ 登录失败：用户标识格式异常');
+    }
+
+    // ====== 第 3 步：获取用户信息（昵称、头像） ======
+    let qqNickname = 'QQ用户';
+    let qqAvatar = '';
+    try {
+      const userRes = await axios.get('https://graph.qq.com/user/get_user_info', {
+        params: { access_token: accessToken, oauth_consumer_key: process.env.QQ_APPID, openid },
+        timeout: 10000,
+      });
+      const qqUser = userRes.data;
+      if (qqUser && qqUser.ret === 0) {
+        qqNickname = qqUser.nickname || 'QQ用户';
+        qqAvatar = qqUser.figureurl_qq_2 || qqUser.figureurl_qq_1 || '';
+      }
+    } catch (e) {
+      console.warn('[QQ] get_user_info failed, using defaults:', e.message);
+    }
 
     const db = getDatabase();
 
+    // ====== 第 4 步：按模式处理 ======
     if (mode === 'bind') {
-      // ====== 绑定模式：不登录，只返回 openid 给前端，由前端调 bind API ======
-      // 前端回调页面收到后，调用 POST /api/oauth/qq/bind 把 openid 绑定到当前用户
+      // ====== 绑定模式 ======
+      // 只传必要的参数，避免 URL 过长
       const redirectParams = new URLSearchParams({
         mode: 'bind',
         openid,
         qq_nickname: qqNickname,
-        qq_avatar: qqAvatar,
       });
       res.redirect(`${BASE_URL}/#/oauth/callback?${redirectParams.toString()}`);
     } else {
-      // ====== 登录模式：查找已绑定的用户，不自动创建 ======
+      // ====== 登录模式 ======
       // 确保 qq_openid 列存在
       try { db.exec('ALTER TABLE users ADD COLUMN qq_openid TEXT'); } catch {}
 
       const user = db.prepare('SELECT id, username, uid, avatar, email FROM users WHERE qq_openid = ?').get(openid);
       if (!user) {
-        // 未绑定，重定向到首页并附带错误信息
         const errorParams = new URLSearchParams({ oauth_error: 'qq_not_bound', qq_nickname: qqNickname });
         res.redirect(`${BASE_URL}/#/?${errorParams.toString()}`);
         return;
@@ -98,8 +174,8 @@ router.get('/qq/callback', async (req, res) => {
       res.redirect(`${BASE_URL}/#/oauth/callback?token=${token}&user=${encodeURIComponent(JSON.stringify(user))}`);
     }
   } catch (e) {
-    console.error('QQ OAuth error:', e.message);
-    res.status(500).send('QQ登录失败');
+    console.error('[QQ OAuth Error]', e.message, e.stack?.substring(0, 200));
+    redirectError('QQ 登录失败');
   }
 });
 

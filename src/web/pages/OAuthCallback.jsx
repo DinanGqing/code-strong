@@ -18,9 +18,37 @@ export default function OAuthCallback() {
   useEffect(() => {
     const mode = params.get('mode');
 
+    // 处理服务端返回的错误
+    const serverError = params.get('error');
+    if (serverError) {
+      localStorage.setItem('qq_bind_error', serverError);
+      navigate('/settings', { replace: true });
+      return;
+    }
+
+    // 处理登录模式未绑定的情况
+    const oauthError = params.get('oauth_error');
+    if (oauthError) {
+      if (oauthError === 'qq_not_bound') {
+        const msg = `QQ 账号 "${params.get('qq_nickname') || 'QQ用户'}" 未绑定任何账号，请先在账户设置中绑定`;
+        localStorage.setItem('qq_bind_error', msg);
+        navigate('/settings', { replace: true });
+      } else {
+        localStorage.setItem('qq_bind_error', oauthError);
+        navigate('/', { replace: true });
+      }
+      return;
+    }
+
     if (mode === 'bind') {
       const openid = params.get('openid');
       const qqNickname = params.get('qq_nickname') || 'QQ用户';
+
+      if (!openid) {
+        localStorage.setItem('qq_bind_error', 'QQ 绑定失败：缺少用户标识');
+        navigate('/settings', { replace: true });
+        return;
+      }
 
       const doBind = async () => {
         try {

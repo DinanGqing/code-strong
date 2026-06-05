@@ -119,7 +119,7 @@ export default function Skills() {
         </DialogActions>
       </Dialog>
 
-      <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={() => setSnackbarOpen(false)} anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}>
+      <Snackbar open={snackbarOpen} autoHideDuration={2000} onClose={() => setSnackbarOpen(false)} anchorOrigin={{ vertical: 'center', horizontal: 'center' }}>
         <Alert onClose={() => setSnackbarOpen(false)} severity="success" sx={{ width: '100%', background: 'rgba(0, 200, 83, 0.9)', color: '#fff', backdropFilter: 'blur(8px)' }}>✅ 代码已复制到剪贴板</Alert>
       </Snackbar>
     </Container>
