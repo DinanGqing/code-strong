@@ -95,10 +95,10 @@ export default function AIAssistant() {
     <Box
       sx={{
         display: 'flex', flexDirection: 'column',
-        height: '100%',
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       }}
     >
-      {/* 消息列表 — 给底部输入框留空间 */}
+      {/* 消息列表 */}
       <Box
         ref={listRef}
         sx={{
@@ -108,7 +108,6 @@ export default function AIAssistant() {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
-          pb: 10,
           '&::-webkit-scrollbar': { width: 4 },
           '&::-webkit-scrollbar-thumb': { background: 'rgba(0,212,255,0.3)', borderRadius: 2 },
         }}

@@ -186,7 +186,7 @@ export default function App() {
       >
         {/* 路由内容区 — flex 撑满 */}
         <Box sx={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+          <Box sx={{ flex: 1, overflow: 'hidden', minHeight: 0, position: 'relative' }}>
             <Suspense fallback={<PageLoading />}>
               <Routes>
             {/* Tab 页面 — 首页重定向到消息 */}
@@ -235,6 +235,7 @@ export default function App() {
         onClose={() => setForgotOpen(false)}
         onSwitchToLogin={handleOpenLogin}
       />
+    </Box>
     </Box>
   );
 }
