@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   Box,
-  Typography,
   TextField,
   IconButton,
   Avatar,
@@ -99,15 +98,6 @@ export default function AIAssistant() {
         height: '100%',
       }}
     >
-      {/* 头部 */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2, py: 2, borderBottom: '1px solid rgba(0,0,0,0.06)', flexShrink: 0 }}>
-        <SmartToyIcon sx={{ color: '#00D4FF', fontSize: 28 }} />
-        <Box>
-          <Typography sx={{ fontWeight: 700, color: isDark ? '#e0e0e0' : '#1a1a2e', fontSize: '1rem' }}>AI 助手</Typography>
-          <Typography sx={{ color: isDark ? 'rgba(224,224,224,0.45)' : 'rgba(26,26,46,0.45)', fontSize: '0.75rem' }}>智能对话 · 随时解答</Typography>
-        </Box>
-      </Box>
-
       {/* 消息列表 — 给底部输入框留空间 */}
       <Box
         ref={listRef}
@@ -170,10 +160,9 @@ export default function AIAssistant() {
         )}
       </Box>
 
-      {/* 输入框 — 固定底部，不随内容滚动 */}
+      {/* 输入框 — 固定在底部导航栏上方 */}
       <Box
         sx={{
-          position: 'sticky', bottom: 0, left: 0, right: 0,
           px: 2, py: 1.5,
           borderTop: '1px solid rgba(0,0,0,0.06)',
           background: isDark ? 'rgba(10, 10, 26, 0.95)' : '#ffffff',
