@@ -61,9 +61,9 @@ export default function AccountSettings() {
       if (res.code !== 0) throw new Error(res.message);
       if (import.meta.env.VITE_PLATFORM === 'app') {
         const { Browser } = await import('@capacitor/browser');
-        await Browser.open({ url: data.data.url });
+        await Browser.open({ url: res.data.url });
       } else {
-        window.location.href = data.data.url;
+        window.location.href = res.data.url;
       }
     } catch (e) {
       setToast({ open: true, message: '获取 QQ 授权链接失败', severity: 'error' });
