@@ -186,14 +186,18 @@ export default function App() {
       >
         {/* 路由内容区 — flex 撑满 */}
         <Box sx={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ flex: 1, overflow: 'hidden', minHeight: 0, position: 'relative' }}>
+          <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minHeight: 0 }}>
             <Suspense fallback={<PageLoading />}>
               <Routes>
             {/* Tab 页面 — 首页重定向到消息 */}
             <Route path="/" element={<Navigate to="/messages" replace />} />
             <Route path="/messages" element={<Messages />} />
             <Route path="/channels" element={<Channels />} />
-            <Route path="/ai" element={<AIAssistant />} />
+            <Route path="/ai" element={
+              <Box sx={{ height: '100%', overflow: 'hidden', position: 'relative' }}>
+                <AIAssistant />
+              </Box>
+            } />
             <Route path="/skills" element={<Skills />} />
 
             {/* 原有页面 */}
