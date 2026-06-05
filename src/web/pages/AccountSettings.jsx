@@ -31,11 +31,60 @@ export default function AccountSettings() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
   const [deleting, setDeleting] = useState(false);
+  const [qqBound, setQqBound] = useState(false);
+  const [qqLoading, setQqLoading] = useState(true);
+  const [qqBindLoading, setQqBindLoading] = useState(false);
 
   useEffect(() => {
     if (user) { setForm({ username: user.username || '', email: user.email || '', avatar: user.avatar || '', bio: user.bio || '' }); }
     client.get('/auth/stats').then(res => { if (res.code === 0) setStats(res.data); }).finally(() => setStatsLoading(false));
+
+    client.get('/oauth/qq/status').then(res => { if (res.code === 0) setQqBound(res.data.bound); }).finally(() => setQqLoading(false));
+
+    const bindSuccess = localStorage.getItem('qq_bind_success');
+    const bindError = localStorage.getItem('qq_bind_error');
+    if (bindSuccess) {
+      setToast({ open: true, message: 'QQ 绑定成功', severity: 'success' });
+      setQqBound(true);
+      localStorage.removeItem('qq_bind_success');
+    }
+    if (bindError) {
+      setToast({ open: true, message: bindError, severity: 'error' });
+      localStorage.removeItem('qq_bind_error');
+    }
   }, [user]);
+
+  const handleBindQQ = async () => {
+    setQqBindLoading(true);
+    try {
+      const { data } = await client.get('/oauth/qq/url?mode=bind');
+      if (data.code !== 0) throw new Error(data.message);
+      if (import.meta.env.VITE_PLATFORM === 'app') {
+        const { Browser } = await import('@capacitor/browser');
+        await Browser.open({ url: data.data.url });
+      } else {
+        window.location.href = data.data.url;
+      }
+    } catch (e) {
+      setToast({ open: true, message: '获取 QQ 授权链接失败', severity: 'error' });
+    } finally {
+      setQqBindLoading(false);
+    }
+  };
+
+  const handleUnbindQQ = async () => {
+    try {
+      const res = await client.post('/oauth/qq/unbind');
+      if (res.code === 0) {
+        setQqBound(false);
+        setToast({ open: true, message: 'QQ 解绑成功', severity: 'success' });
+      } else {
+        setToast({ open: true, message: res.message || '解绑失败', severity: 'error' });
+      }
+    } catch {
+      setToast({ open: true, message: '解绑失败', severity: 'error' });
+    }
+  };
 
   const isEmailDifferent = form.email.trim() !== (user?.email || '');
 
@@ -104,6 +153,35 @@ export default function AccountSettings() {
           <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 2 }}>最近访问记录</Typography>
           <TableContainer component={Paper} sx={{ background: 'transparent', maxHeight: 300 }}><Table size="small"><TableHead><TableRow><TableCell sx={{ color: 'text.secondary', borderColor: 'rgba(255,255,255,0.06)' }}>时间</TableCell><TableCell sx={{ color: 'text.secondary', borderColor: 'rgba(255,255,255,0.06)' }}>IP</TableCell></TableRow></TableHead><TableBody>{stats.recentLogs.map((log, i) => (<TableRow key={i}><TableCell sx={{ color: '#e0e0e0', borderColor: 'rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>{log.time}</TableCell><TableCell sx={{ color: 'text.secondary', borderColor: 'rgba(255,255,255,0.04)', fontSize: '0.85rem', fontFamily: 'monospace' }}>{log.ip}</TableCell></TableRow>))}{stats.recentLogs.length === 0 && (<TableRow><TableCell colSpan={2} sx={{ color: 'text.secondary', textAlign: 'center', borderColor: 'rgba(255,255,255,0.04)' }}>暂无访问记录</TableCell></TableRow>)}</TableBody></Table></TableContainer>
         </>)}
+      </CardContent></Card>
+
+      {/* QQ 第三方账号绑定 */}
+      <Card className="glass-card" sx={{ mt: 4, border: qqBound ? '1px solid rgba(0,212,255,0.2)' : '1px solid rgba(255,255,255,0.06)' }}><CardContent sx={{ p: 4 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box>
+            <Typography variant="h6" sx={{ fontWeight: 700, mb: 0.5 }}>第三方账号绑定</Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+              {qqLoading ? '查询中...' : qqBound ? '已绑定 QQ 账号，可使用 QQ 快速登录' : '绑定 QQ 后，可使用 QQ 一键登录'}
+            </Typography>
+          </Box>
+          <Box>
+            {qqLoading ? (
+              <CircularProgress size={24} sx={{ color: '#00D4FF' }} />
+            ) : qqBound ? (
+              <Button variant="outlined" onClick={handleUnbindQQ}
+                sx={{ color: '#ff5252', borderColor: 'rgba(255,82,82,0.3)',
+                  '&:hover': { borderColor: '#ff5252', background: 'rgba(255,82,82,0.08)' } }}>
+                解绑 QQ
+              </Button>
+            ) : (
+              <Button variant="contained" onClick={handleBindQQ} disabled={qqBindLoading}
+                sx={{ background: qqBindLoading ? 'rgba(255,255,255,0.12)' : 'linear-gradient(135deg, #12B7F5, #0D9ED9)',
+                  '&:hover': { background: 'linear-gradient(135deg, #00D4FF, #12B7F5)' } }}>
+                {qqBindLoading ? '跳转中...' : '绑定 QQ'}
+              </Button>
+            )}
+          </Box>
+        </Box>
       </CardContent></Card>
 
       <Card className="glass-card" sx={{ mt: 4, border: '1px solid rgba(255,82,82,0.15)' }}><CardContent sx={{ p: 4 }}>
