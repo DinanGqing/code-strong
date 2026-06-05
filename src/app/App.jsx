@@ -180,13 +180,14 @@ export default function App() {
           zIndex: 1,
           bgcolor: theme.palette.mode === 'dark' ? 'transparent' : '#f0f0f0',
           paddingTop: hideHeader ? 0 : 'calc(64px + var(--status-bar-height, 24px))',
-          paddingBottom: '72px',
+          paddingBottom: '88px',
           overflow: 'hidden',
         }}
       >
-        {/* 路由内容区 — flex 撑满 */}
-        <Box sx={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <Box sx={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', minHeight: 0 }}>
+        {/* 路由内容区 */}
+        <Box sx={{ height: '100%', overflow: 'hidden', position: 'relative' }}>
+          {/* 通用滚动区域 */}
+          <Box sx={{ height: '100%', overflowY: 'auto', overflowX: 'hidden' }}>
             <Suspense fallback={<PageLoading />}>
               <Routes>
             {/* Tab 页面 — 首页重定向到消息 */}
@@ -212,7 +213,7 @@ export default function App() {
             <Route path="/channel/:channelId" element={<ChannelChat />} />
           </Routes>
         </Suspense>
-        </Box>
+      </Box>
       </Box>
 
       {/* 底部导航栏 */}
