@@ -171,7 +171,7 @@ export default function App() {
         />
       )}
 
-      {/* 主内容区 — 独立滚动容器 */}
+      {/* 主内容区 — 背景固定，内容独立滚动 */}
       <Box
         component="main"
         sx={{
@@ -181,13 +181,13 @@ export default function App() {
           bgcolor: theme.palette.mode === 'dark' ? 'transparent' : '#f0f0f0',
           paddingTop: hideHeader ? 0 : 'calc(64px + var(--status-bar-height, 24px))',
           paddingBottom: '72px',
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          WebkitOverflowScrolling: 'touch',
+          overflow: 'hidden',
         }}
       >
-        <Suspense fallback={<PageLoading />}>
-          <Routes>
+        {/* 路由内容区 */}
+        <Box sx={{ height: '100%', overflow: 'hidden' }}>
+          <Suspense fallback={<PageLoading />}>
+            <Routes>
             {/* Tab 页面 — 首页重定向到消息 */}
             <Route path="/" element={<Navigate to="/messages" replace />} />
             <Route path="/messages" element={<Messages />} />
@@ -207,6 +207,7 @@ export default function App() {
             <Route path="/channel/:channelId" element={<ChannelChat />} />
           </Routes>
         </Suspense>
+      </Box>
       </Box>
 
       {/* 底部导航栏 */}
