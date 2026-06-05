@@ -56,7 +56,7 @@ export default function Skills() {
   return (
     <Container maxWidth="lg" sx={{ py: 6 }}>
       <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography variant="h3" className="section-title" sx={{ mb: 2 }}>🛠️ 技能广场</Typography>
+        <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: 'text.primary' }}>技能广场</Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 600, mx: 'auto' }}>
           探索海量AI技能模板，覆盖代码生成、数据分析、图像处理等数十个领域。点击技能卡片即可本地生成对应代码模板，一键复制使用。
         </Typography>
@@ -74,10 +74,10 @@ export default function Skills() {
                 <CardActionArea onClick={() => handleSkillClick(skill)} sx={{ height: '100%' }}>
                   <CardContent sx={{ p: 3, display: 'flex', flexDirection: 'column', height: '100%' }}>
                     <Box sx={{ width: 64, height: 64, borderRadius: 2, display: 'flex', alignItems: 'center', justifyContent: 'center', background: `linear-gradient(135deg, ${skill.color}22, ${skill.color}44)`, color: skill.color, mb: 2 }}>{skill.icon}</Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: skill.color }}>{skill.name}</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 700, mb: 1, color: 'text.primary' }}>{skill.name}</Typography>
                     <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2, flex: 1 }}>{skill.description}</Typography>
                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mb: 2 }}>
-                      {skill.tags.map((tag, i) => (<Chip key={i} label={tag} size="small" sx={{ background: 'rgba(0,180,216,0.1)', color: '#00D4FF', fontSize: '0.7rem', height: 22 }} />))}
+                      {skill.tags.map((tag, i) => (<Chip key={i} label={tag} size="small" sx={{ background: 'rgba(0,0,0,0.06)', color: 'text.secondary', fontSize: '0.7rem', height: 22 }} />))}
                     </Box>
                     {skill.download && (<Button variant="contained" size="small" fullWidth href={skill.download} download startIcon={<DownloadIcon />} onClick={(e) => e.stopPropagation()}
                       sx={{ mb: 1.5, background: `linear-gradient(135deg, ${skill.color}, ${skill.color}88)`, fontWeight: 600, fontSize: '0.8rem', textTransform: 'none',
@@ -95,7 +95,7 @@ export default function Skills() {
       <Box sx={{ textAlign: 'center', mt: 6, pt: 4, borderTop: '1px solid rgba(0,0,0,0.06)' }}>
         <Typography variant="body2" sx={{ color: 'text.secondary', mb: 2 }}>更多优质技能模板，尽在 Skill Hub 社区</Typography>
         <Button variant="outlined" size="large" onClick={() => window.open('https://www.skillhub.cn', '_blank')} endIcon={<OpenInNewIcon />}
-          sx={{ borderColor: '#9B59B6', color: '#B07CD8', borderRadius: 3, px: 4, py: 1.2, '&:hover': { borderColor: '#B07CD8', background: 'rgba(155, 89, 182, 0.1)' } }}>去 Skill Hub 探索更多 🚀</Button>
+          sx={{ borderColor: 'text.secondary', color: 'text.primary', borderRadius: 3, px: 4, py: 1.2, '&:hover': { borderColor: '#00B4D8', background: 'rgba(0,180,216,0.1)' } }}>去 Skill Hub 探索更多 🚀</Button>
       </Box>
 
       <Dialog open={dialogOpen} onClose={() => { setDialogOpen(false); setSelectedSkill(null); }} maxWidth="md" fullWidth

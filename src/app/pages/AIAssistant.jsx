@@ -104,7 +104,7 @@ export default function AIAssistant() {
         sx={{
           flex: 1,
           overflowY: 'auto',
-          px: 2, py: 2,
+          px: 2, py: 2, pt: 3,
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
