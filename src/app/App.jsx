@@ -184,10 +184,11 @@ export default function App() {
           overflow: 'hidden',
         }}
       >
-        {/* 路由内容区 */}
-        <Box sx={{ height: '100%', overflow: 'hidden' }}>
-          <Suspense fallback={<PageLoading />}>
-            <Routes>
+        {/* 路由内容区 — flex 撑满 */}
+        <Box sx={{ height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <Box sx={{ flex: 1, overflow: 'hidden', minHeight: 0 }}>
+            <Suspense fallback={<PageLoading />}>
+              <Routes>
             {/* Tab 页面 — 首页重定向到消息 */}
             <Route path="/" element={<Navigate to="/messages" replace />} />
             <Route path="/messages" element={<Messages />} />
@@ -207,7 +208,7 @@ export default function App() {
             <Route path="/channel/:channelId" element={<ChannelChat />} />
           </Routes>
         </Suspense>
-      </Box>
+        </Box>
       </Box>
 
       {/* 底部导航栏 */}
