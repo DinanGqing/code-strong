@@ -223,6 +223,87 @@ export async function initDatabase() {
     );
   `);
 
+  // ===== 社交系统表 =====
+  // 好友申请表
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS friend_requests (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      from_user_id INTEGER NOT NULL,
+      to_user_id INTEGER NOT NULL,
+      status TEXT DEFAULT 'pending',
+      created_at TEXT DEFAULT (datetime('now', 'localtime')),
+      FOREIGN KEY (from_user_id) REFERENCES users(id),
+      FOREIGN KEY (to_user_id) REFERENCES users(id)
+    );
+  `);
+
+  // 好友关系表
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS friends (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      friend_id INTEGER NOT NULL,
+      created_at TEXT DEFAULT (datetime('now', 'localtime')),
+      FOREIGN KEY (user_id) REFERENCES users(id),
+      FOREIGN KEY (friend_id) REFERENCES users(id)
+    );
+  `);
+
+  // 私聊消息表
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS private_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      from_user_id INTEGER NOT NULL,
+      to_user_id INTEGER NOT NULL,
+      content TEXT NOT NULL,
+      is_read INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now', 'localtime')),
+      FOREIGN KEY (from_user_id) REFERENCES users(id),
+      FOREIGN KEY (to_user_id) REFERENCES users(id)
+    );
+  `);
+
+  // 频道表
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS channels (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      avatar TEXT DEFAULT '',
+      creator_id INTEGER NOT NULL,
+      created_at TEXT DEFAULT (datetime('now', 'localtime')),
+      FOREIGN KEY (creator_id) REFERENCES users(id)
+    );
+  `);
+
+  // 频道成员表
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS channel_members (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      role TEXT DEFAULT 'member',
+      joined_at TEXT DEFAULT (datetime('now', 'localtime')),
+      FOREIGN KEY (channel_id) REFERENCES channels(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+  `);
+
+  // 频道消息表
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS channel_messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel_id INTEGER NOT NULL,
+      user_id INTEGER NOT NULL,
+      content TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now', 'localtime')),
+      FOREIGN KEY (channel_id) REFERENCES channels(id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    );
+  `);
+
+  db.save();
+
   // 给没有 uid 的旧用户按 id 顺序分配 UID
   const needUid = db.prepare('SELECT id FROM users WHERE uid IS NULL ORDER BY id').all();
   if (needUid.length > 0) {

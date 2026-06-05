@@ -2,7 +2,7 @@
 
 > AI Agent 开发者社区 — 前端 SPA + 后端 Express + Capacitor 跨平台移动应用
 
-**版本**：v1.1.4 | **更新**：2026-06-03
+**版本**：v1.1.5 | **更新**：2026-06-04
 
 ---
 
@@ -75,7 +75,8 @@ code-strong/
 │   ├── pages/                    # 页面组件（懒加载）
 │   └── index.css                 # 全局样式 + 动效
 ├── server/                       # 后端
-│   ├── index.js                  # Express 入口
+│   ├── index.js                  # Express 入口（含 Socket.IO 集成）
+│   ├── websocket.js               # Socket.IO WebSocket 服务
 │   ├── .env                      # 环境变量
 │   ├── db/                       # 数据库初始化 + 种子数据
 │   ├── middleware/                # 中间件（auth、敏感词过滤）
@@ -140,6 +141,34 @@ code-strong/
 - **卡片追光**：鼠标悬停 3D 倾斜 + 光晕效果
 - **小游戏**：网页端专属（像素龙虾相关）
 - **反馈系统**：举报 / 建议 / 问题反馈
+
+### 4.6 社交系统
+
+| 功能 | 说明 |
+|------|------|
+| 好友系统 | 搜索 UID 添加好友，好友申请（同意/拒绝），删除好友 |
+| 私聊 | 好友间 1v1 实时聊天，WebSocket 推送，消息记录分页 |
+| 频道 | 创建/搜索/加入频道，频道内多人实时聊天，成员管理（管理员踢人） |
+
+#### WebSocket 事件
+
+| 方向 | 事件 | 说明 |
+|------|------|------|
+| 客户端→服务器 | `send_private_message` | `{to_user_id, content}` 发送私聊消息 |
+| 客户端→服务器 | `send_channel_message` | `{channel_id, content}` 发送频道消息 |
+| 客户端→服务器 | `join_channel` / `leave_channel` | 加入/离开频道房间 |
+| 客户端→服务器 | `friend_request_sent` | 通知对方有新好友申请 |
+| 服务器→客户端 | `new_private_message` | 收到新的私聊消息 |
+| 服务器→客户端 | `new_channel_message` | 收到新的频道消息 |
+| 服务器→客户端 | `friend_request_notification` | 收到好友申请通知 |
+
+#### 连接方式
+
+```js
+// 前端连接 WebSocket
+import { io } from 'socket.io-client';
+const socket = io('', { auth: { token: 'JWT_TOKEN' } });
+```
 
 ---
 
@@ -211,7 +240,44 @@ code-strong/
 | POST | `/api/feedback` | 可选 | 提交反馈 / 举报 |
 | GET | `/api/feedback` | JWT | 查看反馈列表 |
 
-### 5.9 其他
+### 5.9 社交系统 (social.js)
+
+> 需要 JWT 认证。所有接口前缀 `/api/social`
+
+**好友系统**
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/social/users/search?q=` | 按 UID/用户名搜索用户（排除自己） |
+| POST | `/api/social/friend/request` | `{to_uid}` 发送好友申请（若对方已申请过则自动互加） |
+| GET | `/api/social/friend/requests` | 查看我收到的待审批好友申请 |
+| GET | `/api/social/friend/sent-requests` | 我发出的好友申请状态 |
+| POST | `/api/social/friend/respond` | `{request_id, action}` 回应申请（accept/reject） |
+| GET | `/api/social/friends` | 好友列表（含未读消息数） |
+| DELETE | `/api/social/friend/:friendId` | 删除好友 |
+
+**私聊**
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/api/social/messages/:userId` | 聊天记录（分页，每页50条） |
+| GET | `/api/social/conversations` | 会话列表（含未读数、最后一条消息） |
+
+**频道**
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/api/social/channels` | `{name, description, avatar}` 创建频道 |
+| GET | `/api/social/channels` | 我加入的频道列表 |
+| GET | `/api/social/channels/discover?q=` | 发现/搜索公开频道 |
+| POST | `/api/social/channels/:id/join` | 加入频道 |
+| POST | `/api/social/channels/:id/leave` | 退出频道 |
+| GET | `/api/social/channels/:id/members` | 频道成员列表 |
+| GET | `/api/social/channels/:id/messages` | 频道消息历史（分页） |
+| POST | `/api/social/channels/:id/kick` | 踢出成员（管理员） |
+| DELETE | `/api/social/channels/:id` | 解散频道（创建者） |
+
+### 5.10 其他
 
 | 方法 | 路径 | 认证 | 说明 |
 |------|------|------|------|
@@ -342,6 +408,15 @@ pm2 restart code-strong --update-env
 | `community_activities` | 社区动态 |
 | `login_logs` | 登录日志 |
 | `feedbacks` | 用户反馈 |
+| `friend_requests` | 好友申请（from_user_id, to_user_id, status） |
+| `friends` | 好友关系（双向记录） |
+| `private_messages` | 私聊消息（含 is_read 标记） |
+| `channels` | 频道（name, description, creator_id） |
+| `channel_members` | 频道成员（role: member/admin） |
+| `channel_messages` | 频道消息 |
+
+> **WebSocket 依赖**：`socket.io@4`（服务端），`socket.io-client@4`（前端）
+> 私聊和频道消息的实时推送通过 Socket.IO 实现，与 Express 共享同一 HTTP 端口（3001）。
 
 ---
 

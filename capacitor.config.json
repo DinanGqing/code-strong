@@ -1,7 +1,7 @@
 {
   "appId": "com.zhimaquan.app",
   "appName": "智码圈",
-  "webDir": "dist",
+  "webDir": "dist/app",
   "server": {
     "androidScheme": "https",
     "iosScheme": "capacitor"

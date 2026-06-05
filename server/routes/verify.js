@@ -28,7 +28,7 @@ function maskTarget(target) {
 router.post('/send-code', (req, res) => {
   try {
     const { email, type } = req.body;
-    const target = (email || '').trim();
+    const target = (email || '').trim().replace(/\s/g, '');
 
     if (!isEmail(target)) {
       return res.json({ code: 1, data: null, message: '请输入有效的邮箱地址' });
@@ -85,8 +85,10 @@ router.post('/send-code', (req, res) => {
 
     saveDatabase();
 
-    // 发送邮件
-    sendVerificationCode(target, code, type);
+    // 发送邮件（非阻塞，失败不中断响应）
+    sendVerificationCode(target, code, type).catch(err => {
+      console.error('[Verify] sendVerificationCode error:', err.message);
+    });
 
     return res.json({
       code: 0,

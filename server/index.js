@@ -5,6 +5,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { initDatabase, getDatabase } from './db/database.js';
 import { runSeed } from './db/seed.js';
+import { initWebSocket } from './websocket.js';
+import http from 'http';
 import authRoutes from './routes/auth.js';
 import toolsRoutes from './routes/tools.js';
 import communityRoutes from './routes/community.js';
@@ -13,6 +15,7 @@ import verifyRoutes from './routes/verify.js';
 import uploadRoutes from './routes/upload.js';
 import oauthRoutes from './routes/oauth.js';
 import feedbackRoutes from './routes/feedback.js';
+import socialRoutes from './routes/social.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -68,6 +71,9 @@ async function start() {
   // 用户反馈/举报路由
   app.use('/api/feedback', feedbackRoutes);
 
+  // 社交系统路由（好友、消息、频道）
+  app.use('/api/social', socialRoutes);
+
   // 健康检查
   app.get('/api/health', (_req, res) => {
     res.json({ code: 0, data: { status: 'ok' }, message: '服务运行正常' });
@@ -111,7 +117,10 @@ async function start() {
     });
   });
 
-  app.listen(PORT, '0.0.0.0', () => {
+  const server = http.createServer(app);
+  initWebSocket(server);
+
+  server.listen(PORT, '0.0.0.0', () => {
     console.log(`[Server] 智码圈已启动（前端+后端统一端口）: http://0.0.0.0:${PORT}`);
   });
 }

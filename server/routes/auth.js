@@ -58,7 +58,7 @@ router.post('/register', (req, res) => {
     if (!username || !username.trim()) {
       return res.json({ code: 1, data: null, message: '昵称不能为空' });
     }
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return res.json({ code: 1, data: null, message: '请输入有效的邮箱地址' });
     }
     if (!password || password.length < 6) {
@@ -232,7 +232,7 @@ router.get('/me', authMiddleware, (req, res) => {
 router.post('/forgot-password', (req, res) => {
   try {
     const { email } = req.body;
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return res.json({ code: 1, data: null, message: '请输入有效的邮箱地址' });
     }
     const db = getDatabase();
@@ -273,7 +273,7 @@ router.post('/forgot-password', (req, res) => {
 router.post('/reset-password', (req, res) => {
   try {
     const { email, code, newPassword } = req.body;
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       return res.json({ code: 1, data: null, message: '请输入有效的邮箱地址' });
     }
     if (!code || code.length !== 6) return res.json({ code: 1, data: null, message: '请输入6位验证码' });

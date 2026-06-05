@@ -5,6 +5,27 @@
 
 ---
 
+## [1.1.5] - 2026-06-04
+
+### ✨ 新增 (Added)
+
+- **社交系统（好友 + 私聊 + 频道）**
+  - 好友系统：搜索 UID 添加好友、好友申请审批、好友列表、删除好友
+  - 私聊：好友间 1v1 实时聊天（Socket.IO WebSocket），消息记录分页
+  - 频道：创建/搜索/加入频道，频道内多人实时聊天，管理员踢人
+  - 导航栏新增「社交」入口
+- **Socket.IO WebSocket 实时通信**
+  - `server/websocket.js` — WebSocket 服务初始化与事件处理
+  - `src/api/socket.js` — 前端 WebSocket 客户端
+  - 私聊和频道消息实时推送
+- **新增 6 张数据库表**：`friend_requests`, `friends`, `private_messages`, `channels`, `channel_members`, `channel_messages`
+
+### 🛠 变更 (Changed)
+
+- 服务器架构：Express 从 `app.listen()` 改为 `http.createServer(app)` + Socket.IO 集成
+- 首页删除统计卡片区块（接口请求失败显示 "..."）
+- 动态用户名「龙虾哥🦞」→「码坚强」
+
 ## [1.1.4] - 2026-06-03
 
 ### 🐛 修复 (Fixed)

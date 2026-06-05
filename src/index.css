@@ -2,6 +2,70 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========== 主题变量（CSS 自定义属性） ========== */
+:root, .theme-light {
+  /* 背景色 */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary: rgba(0,0,0,0.03);
+  --bg-drawer: #ffffff;
+  --bg-dialog: #ffffff;
+  --bg-card: #ffffff;
+  --bg-header: #ffffff;
+  --bg-nav: #ffffff;
+  --bg-input: rgba(0,0,0,0.03);
+
+  /* 文字色 */
+  --text-primary: #1a1a2e;
+  --text-secondary: rgba(26,26,46,0.65);
+  --text-muted: rgba(26,26,46,0.45);
+  --text-muted2: rgba(26,26,46,0.35);
+  --text-accent: #00B4D8;
+
+  /* 边框色 */
+  --border-color: rgba(0,0,0,0.06);
+  --border-strong: rgba(0,0,0,0.08);
+
+  /* 消息气泡 */
+  --bubble-user: linear-gradient(135deg, #00B4D8, #0077B6);
+  --bubble-other: rgba(0,0,0,0.04);
+  --bubble-user-text: #ffffff;
+  --bubble-other-text: #1a1a2e;
+
+  /* 状态栏色（MUI 覆盖）*/
+  --scrollbar-track: #f0f0f0;
+  --scrollbar-thumb: #00B4D8;
+}
+
+/* 深色模式 */
+.theme-dark {
+  --bg-primary: #0a0a1a;
+  --bg-secondary: rgba(18, 18, 42, 0.9);
+  --bg-tertiary: rgba(255,255,255,0.04);
+  --bg-drawer: rgba(14, 14, 36, 0.98);
+  --bg-dialog: rgba(18, 18, 42, 0.95);
+  --bg-card: rgba(18, 18, 42, 0.9);
+  --bg-header: rgba(10, 10, 26, 0.85);
+  --bg-nav: rgba(10, 10, 26, 0.92);
+  --bg-input: rgba(255,255,255,0.04);
+
+  --text-primary: #e0e0e0;
+  --text-secondary: rgba(255,255,255,0.65);
+  --text-muted: rgba(255,255,255,0.45);
+  --text-muted2: rgba(255,255,255,0.35);
+
+  --border-color: rgba(255,255,255,0.06);
+  --border-strong: rgba(255,255,255,0.1);
+
+  --bubble-user: linear-gradient(135deg, #00B4D8, #0077B6);
+  --bubble-other: rgba(255,255,255,0.06);
+  --bubble-user-text: #ffffff;
+  --bubble-other-text: #e0e0e0;
+
+  --scrollbar-track: #0a0a1a;
+  --scrollbar-thumb: #00B4D8;
+}
+
 /* 全局基础样式 */
 * {
   margin: 0;
@@ -15,40 +79,29 @@ html {
 
 body {
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  background-color: #0a0a1a;
-  color: #e0e0e0;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   min-height: 100vh;
-  /* 全面屏安全区域适配 */
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
   overflow-x: hidden;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 /* 滚动条样式 */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #0a0a1a;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #00B4D8;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #00D4FF;
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #00D4FF; }
 
 /* 玻璃态卡片 */
 @layer components {
   .glass-card {
-    @apply rounded-xl border border-white/10;
-    background: rgba(18, 18, 42, 0.7);
+    @apply rounded-xl;
+    background: var(--bg-card);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
   }
 
   .glass-card-hover {
@@ -59,21 +112,6 @@ body {
     border-color: rgba(0, 212, 255, 0.6);
     box-shadow: 0 8px 32px rgba(0, 180, 216, 0.25), 0 0 60px rgba(0, 180, 216, 0.1);
     background: rgba(0, 180, 216, 0.12) !important;
-  }
-
-  .glass-card-hover:hover .MuiTypography-root {
-    transition: color 0.3s ease;
-  }
-
-  /* 标题文字变亮青色 */
-  .glass-card-hover:hover h5, .glass-card-hover:hover h6 {
-    color: #fff !important;
-  }
-
-  /* 描述文字变白 */
-  .glass-card-hover:hover .MuiTypography-body1,
-  .glass-card-hover:hover .MuiTypography-body2 {
-    color: rgba(255, 255, 255, 0.85) !important;
   }
 
   .gradient-btn {
@@ -131,7 +169,6 @@ body {
   pointer-events: none;
 }
 
-/* 边框辉光 — 更明显的视觉反馈 */
 .glow-card::after {
   content: '';
   position: absolute;

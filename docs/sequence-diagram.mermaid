@@ -1,60 +1,52 @@
 sequenceDiagram
-    participant U as 用户
-    participant LM as LoginModal
-    participant AC as AuthContext
-    participant API as api/auth.js
-    participant Client as api/client.js
-    participant Svr as Express Server
-    participant DB as SQLite
+    participant Dev as 开发者
+    participant NPM as npm / package.json
+    participant Vite as Vite 构建系统
+    participant FS as 文件系统
+    participant Browser as 浏览器/APP
 
-    U->>LM: 输入用户名+密码，点击登录
-    LM->>AC: login(username, password)
-    AC->>API: authApi.login({username, password})
-    API->>Client: axios.post('/api/auth/login', body)
-    Client->>Svr: POST /api/auth/login
-    Svr->>DB: SELECT * FROM users WHERE username = ?
-    DB-->>Svr: user row
-    Svr->>Svr: bcrypt.compare(password, user.password_hash)
-    Svr->>Svr: jwt.sign({id, username}, SECRET, {expiresIn:'7d'})
-    Svr-->>Client: { code:0, data:{ token, user } }
-    Client->>Client: 响应拦截器——无需处理
-    Client-->>API: response.data
-    API-->>AC: { token, user }
-    AC->>AC: localStorage.setItem('token', token)
-    AC->>AC: setUser(user), setToken(token)
-    AC-->>LM: 登录成功
-    LM->>LM: onClose(), 清空表单
-    U->>U: 看到 Navbar 显示用户名
+    Note over Dev,Browser: Web 开发流程 (npm run dev:web)
+    Dev->>NPM: npm run dev:web
+    NPM->>Vite: vite --config vite.config.web.js
+    Vite->>FS: 读取 vite.config.web.js (VITE_PLATFORM=web)
+    Vite->>FS: 读取 src/web/index.html
+    Vite->>FS: 解析 src/web/main.jsx
+    Vite->>FS: 解析 src/web/App.jsx
+    Vite->>FS: import shared/api/* (VITE_API_BASE=/api)
+    Vite->>FS: import shared/contexts/AuthContext
+    Vite->>FS: import shared/components/*
+    Vite->>FS: import web/components/Navbar
+    Vite->>FS: import web/components/Footer
+    Vite->>FS: import web/pages/*
+    Vite-->>Browser: 启动 dev server (:3000)
 
----
+    Note over Dev,Browser: APP 开发流程 (npm run dev:app)
+    Dev->>NPM: npm run dev:app
+    NPM->>Vite: vite --config vite.config.app.js
+    Vite->>FS: 读取 vite.config.app.js (VITE_PLATFORM=app)
+    Vite->>FS: 读取 src/app/index.html
+    Vite->>FS: 解析 src/app/main.jsx
+    Vite->>FS: 解析 src/app/App.jsx
+    Vite->>FS: import shared/api/* (VITE_API_BASE=/api)
+    Vite->>FS: import shared/contexts/AuthContext
+    Vite->>FS: import shared/components/*
+    Vite->>FS: import app/components/Navbar
+    Vite->>FS: import app/pages/*
+    Note over Vite: app/App.jsx 含 Capacitor 动态导入
+    Vite-->>Browser: 启动 dev server (:3000)
 
-sequenceDiagram
-    participant U as 用户
-    participant TD as ToolsDownload
-    participant API as api/tools.js
-    participant Client as api/client.js
-    participant Svr as Express Server
-    participant MW as auth middleware
-    participant DB as SQLite
+    Note over Dev,Browser: Web 构建流程 (npm run build:web)
+    Dev->>NPM: npm run build:web
+    NPM->>Vite: vite build --config vite.config.web.js
+    Vite->>FS: 编译 src/web/ 入口
+    Vite->>FS: 打包 shared/ 依赖
+    Vite->>FS: 输出到 dist/web/
+    Note over Vite: 产物不含 Capacitor 代码
 
-    U->>TD: 填写表单，点击提交上传
-    TD->>API: toolsApi.upload({ name, description, category, tags })
-    API->>Client: axios.post('/api/tools', body)
-    Client->>Client: 请求拦截器——附加 Authorization: Bearer token
-    Client->>Svr: POST /api/tools
-    Svr->>MW: requireAuth(req, res, next)
-    MW->>MW: jwt.verify(token, SECRET)
-    alt token 无效/过期
-        MW-->>Svr: 401 { code: 401, message: "未登录" }
-        Svr-->>Client: 401
-        Client->>Client: 响应拦截器——清除 token，跳转登录
-    else token 有效
-        MW->>MW: req.user = { id, username }
-        MW-->>Svr: next()
-        Svr->>DB: INSERT INTO tools (name, description, category, tags, author_id)
-        DB-->>Svr: { id, name, ... }
-        Svr-->>Client: 201 { code:0, data: {...} }
-        Client-->>API: response.data
-        API-->>TD: 上传成功
-        TD->>TD: 刷新工具列表，关闭弹窗
-    end
+    Note over Dev,Browser: APP 构建流程 (npm run build:app)
+    Dev->>NPM: npm run build:app
+    NPM->>Vite: vite build --config vite.config.app.js
+    Vite->>FS: 编译 src/app/ 入口
+    Vite->>FS: 打包 shared/ 依赖
+    Vite->>FS: 输出到 dist/app/
+    Note over Vite: 产物含 Capacitor 代码

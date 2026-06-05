@@ -13,13 +13,10 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
-        <!-- 全面屏边缘到边缘：彻底消除白边 -->
-        <item name="android:statusBarColor">#0a0a1a</item>
+        <!-- 状态栏完全由 JS (Capacitor StatusBar plugin) 控制，原生不设任何固定值 -->
         <item name="android:navigationBarColor">#0a0a1a</item>
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
         <item name="android:enforceNavigationBarContrast">false</item>
         <item name="android:fitsSystemWindows">false</item>
     </style>

@@ -1,33 +1,68 @@
 classDiagram
-    class users {
-        +INTEGER id PK
-        +TEXT username UNIQUE
-        +TEXT email UNIQUE
-        +TEXT password_hash
-        +TEXT avatar
-        +TEXT bio
-        +TEXT created_at
+    class EnvVars {
+        <<interface>>
+        +string VITE_API_BASE
+        +string VITE_PLATFORM
     }
 
-    class tools {
-        +INTEGER id PK
-        +TEXT name
-        +TEXT description
-        +TEXT category
-        +TEXT tags
-        +INTEGER download_count
-        +INTEGER author_id FK
-        +TEXT created_at
-        +TEXT updated_at
+    class ViteConfig {
+        +string root
+        +string base
+        +buildConfig build
+        +serverConfig server
+        +string outDir
+        +array~Plugin~ plugins
     }
 
-    class community_activities {
-        +INTEGER id PK
-        +TEXT username
-        +TEXT action
-        +TEXT target
-        +TEXT tag
-        +TEXT created_at
+    class webViteConfig {
+        +string outDir = "dist/web"
+        +string entry = "src/web/index.html"
     }
 
-    users "1" -- "0..*" tools : author_id
+    class appViteConfig {
+        +string outDir = "dist/app"
+        +string entry = "src/app/index.html"
+    }
+
+    ViteConfig <|-- webViteConfig
+    ViteConfig <|-- appViteConfig
+    EnvVars ..> webViteConfig : injected by
+    EnvVars ..> appViteConfig : injected by
+
+    class srcLayout {
+        <<directory>>
+    }
+
+    class shared {
+        <<directory>>
+        +api/
+        +contexts/
+        +hooks/
+        +data/
+        +components/
+        +assets/
+    }
+
+    class web {
+        <<directory>>
+        +index.html
+        +main.jsx
+        +App.jsx
+        +components/
+        +pages/
+    }
+
+    class app {
+        <<directory>>
+        +index.html
+        +main.jsx
+        +App.jsx
+        +components/
+        +pages/
+    }
+
+    srcLayout --> shared : contains
+    srcLayout --> web : contains
+    srcLayout --> app : contains
+    web ..> shared : imports from
+    app ..> shared : imports from

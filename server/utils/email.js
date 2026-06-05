@@ -50,15 +50,20 @@ export async function sendVerificationCode(email, code, type = 'register') {
   const transport = getTransporter();
 
   if (transport) {
-    await transport.sendMail({
-      from: `"智码圈社区" <${process.env.SMTP_USER}>`,
-      to: email,
-      subject,
-      html,
-    });
-    console.log(`[Email] 验证码已发送至 ${email}`);
+    try {
+      await transport.sendMail({
+        from: `"智码圈社区" <${process.env.SMTP_USER}>`,
+        to: email,
+        subject,
+        html,
+      });
+      console.log(`[Email] 验证码已发送至 ${email}`);
+    } catch (err) {
+      // SMTP发送失败（授权码过期、QQ限制外域等），降级为控制台打印
+      console.error(`[Email] SMTP发送失败: ${err.message}`);
+      console.log(`\n⚠️ [SMTP Fallback] 验证码: ${code} → ${email}\n`);
+    }
   } else {
-    // 开发模式：打印到控制台
     console.log(`\n📧 [DEV] 验证码已发送至 ${email}`);
     console.log(`📧 [DEV] 验证码: ${code}（${type === 'register' ? '注册' : '重置密码'}，5分钟有效）\n`);
   }
