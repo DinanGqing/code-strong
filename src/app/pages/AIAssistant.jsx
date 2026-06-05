@@ -164,7 +164,7 @@ export default function AIAssistant() {
       <Box
         sx={{
           position: 'fixed',
-          bottom: '56px',
+          bottom: '76px',
           left: 0, right: 0,
           px: 2, py: 1.5,
           borderTop: '1px solid rgba(0,0,0,0.06)',

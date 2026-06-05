@@ -179,8 +179,8 @@ export default function App() {
           position: 'relative',
           zIndex: 1,
           bgcolor: theme.palette.mode === 'dark' ? 'transparent' : '#f0f0f0',
-          paddingTop: hideHeader ? 0 : 'calc(48px + var(--status-bar-height, 24px))',
-          paddingBottom: '60px',
+          paddingTop: hideHeader ? 0 : '8px',
+          paddingBottom: '80px',
           overflow: 'hidden',
         }}
       >
