@@ -110,7 +110,6 @@ export default function App() {
     updateStatusBar();
     return () => { cancelled = true; };
   }, [mode]);
-  }, [mode]);
 
   // 返回手势控制（仅初始化一次）
   // 优先触发 Dialog 关闭（通过自定义事件），再执行路由返回
@@ -180,7 +179,7 @@ export default function App() {
           position: 'relative',
           zIndex: 1,
           bgcolor: theme.palette.mode === 'dark' ? 'transparent' : '#f0f0f0',
-          paddingTop: hideHeader ? 0 : 'calc(60px + var(--status-bar-height, 24px))',
+          paddingTop: hideHeader ? 0 : 'calc(88px + var(--status-bar-height, 24px))',
           paddingBottom: '80px',
           overflowY: 'auto',
           overflowX: 'hidden',
