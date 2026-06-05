@@ -108,6 +108,7 @@ export default function AIAssistant() {
           display: 'flex',
           flexDirection: 'column',
           gap: 2,
+          pb: '68px',
           '&::-webkit-scrollbar': { width: 4 },
           '&::-webkit-scrollbar-thumb': { background: 'rgba(0,212,255,0.3)', borderRadius: 2 },
         }}
@@ -159,14 +160,17 @@ export default function AIAssistant() {
         )}
       </Box>
 
-      {/* 输入框 — 固定在底部导航栏上方 */}
+      {/* 输入框 — 固定于底部导航栏正上方 */}
       <Box
         sx={{
+          position: 'fixed',
+          bottom: '56px',
+          left: 0, right: 0,
           px: 2, py: 1.5,
           borderTop: '1px solid rgba(0,0,0,0.06)',
           background: isDark ? 'rgba(10, 10, 26, 0.95)' : '#ffffff',
           backdropFilter: 'blur(20px)',
-          flexShrink: 0,
+          zIndex: 100,
         }}
       >
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
