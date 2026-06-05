@@ -79,7 +79,7 @@ router.get('/wechat/callback', async (req, res) => {
 // ====== QQ OAuth ======
 router.get('/qq/url', (req, res) => {
   const appId = process.env.QQ_APPID;
-  const redirectUri = encodeURIComponent(`${BASE_URL}/oauth/qq/callback`);
+  const redirectUri = encodeURIComponent(`${BASE_URL}/api/oauth/qq/callback`);
   const state = Math.random().toString(36).substring(2);
   const url = `https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=${appId}&redirect_uri=${redirectUri}&state=${state}&scope=get_user_info`;
   res.json({ code: 0, data: { url, state } });
