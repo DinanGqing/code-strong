@@ -14,10 +14,10 @@ export default function SocialLogin({ onSuccess }) {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      const { data } = await client.get('/oauth/qq/url?mode=login');
-      if (data.code !== 0) throw new Error(data.message);
+      const res = await client.get('/oauth/qq/url?mode=login');
+      if (res.code !== 0) throw new Error(res.message);
 
-      const authUrl = data.data.url;
+      const authUrl = res.data.url;
 
       if (import.meta.env.VITE_PLATFORM === 'app') {
         const { Browser } = await import('@capacitor/browser');

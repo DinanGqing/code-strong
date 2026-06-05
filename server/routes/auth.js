@@ -186,8 +186,9 @@ router.post('/login', (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // 记录登录日志
-    db.prepare('INSERT INTO login_logs (user_id) VALUES (?)').run(user.id);
+    // 记录登录日志（含客户端 IP）
+    const clientIp = req.ip || req.connection?.remoteAddress || '未知';
+    db.prepare('INSERT INTO login_logs (user_id, ip) VALUES (?, ?)').run(user.id, clientIp);
     db.prepare('UPDATE users SET last_login = datetime(\'now\',\'localtime\') WHERE id = ?').run(user.id);
     saveDatabase();
 
@@ -351,9 +352,9 @@ router.get('/stats', authMiddleware, (req, res) => {
       'SELECT COUNT(DISTINCT DATE(login_at)) as days FROM login_logs WHERE user_id = ?'
     ).get(userId);
 
-    // 最近 20 条访问记录
+    // 最近 5 条访问记录
     const recentLogs = db.prepare(
-      'SELECT login_at, ip FROM login_logs WHERE user_id = ? ORDER BY id DESC LIMIT 20'
+      'SELECT login_at, ip FROM login_logs WHERE user_id = ? ORDER BY id DESC LIMIT 5'
     ).all(userId);
 
     return res.json({

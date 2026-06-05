@@ -61,8 +61,8 @@ export default function AccountSettings() {
   const handleBindQQ = async () => {
     setQqBindLoading(true);
     try {
-      const { data } = await client.get('/oauth/qq/url?mode=bind');
-      if (data.code !== 0) throw new Error(data.message);
+      const res = await client.get('/oauth/qq/url?mode=bind');
+      if (res.code !== 0) throw new Error(res.message);
       if (import.meta.env.VITE_PLATFORM === 'app') {
         const { Browser } = await import('@capacitor/browser');
         await Browser.open({ url: data.data.url });
@@ -165,14 +165,19 @@ export default function AccountSettings() {
         </Grid>
       </CardContent></Card>
 
-      <Card className="glass-card"><CardContent sx={{ p: 4 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, mb: 3 }}>账户统计</Typography>
-        {statsLoading ? (<CircularProgress size={24} sx={{ color: '#00D4FF' }} />) : (<>
-          <Box sx={{ display: 'flex', gap: 4, mb: 3 }}><Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><CalendarTodayIcon sx={{ color: '#00D4FF' }} /><Box><Typography variant="h5" sx={{ fontWeight: 700, color: '#00D4FF' }}>{stats.activeDays}</Typography><Typography variant="caption" color="text.secondary">活跃天数</Typography></Box></Box><Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}><HistoryIcon sx={{ color: '#9B59B6' }} /><Box><Typography variant="h5" sx={{ fontWeight: 700, color: '#9B59B6' }}>{stats.recentLogs.length}</Typography><Typography variant="caption" color="text.secondary">访问记录</Typography></Box></Box></Box>
-          <Divider sx={{ borderColor: 'rgba(255,255,255,0.06)', mb: 2 }} />
-          <Typography variant="subtitle2" sx={{ color: 'text.secondary', mb: 2 }}>最近访问记录</Typography>
-          <TableContainer component={Paper} sx={{ background: 'transparent', maxHeight: 300 }}><Table size="small"><TableHead><TableRow><TableCell sx={{ color: 'text.secondary', borderColor: 'rgba(255,255,255,0.06)' }}>时间</TableCell><TableCell sx={{ color: 'text.secondary', borderColor: 'rgba(255,255,255,0.06)' }}>IP</TableCell></TableRow></TableHead><TableBody>{stats.recentLogs.map((log, i) => (<TableRow key={i}><TableCell sx={{ color: '#1a1a2e', borderColor: 'rgba(255,255,255,0.04)', fontSize: '0.85rem' }}>{log.time}</TableCell><TableCell sx={{ color: 'text.secondary', borderColor: 'rgba(255,255,255,0.04)', fontSize: '0.85rem', fontFamily: 'monospace' }}>{log.ip}</TableCell></TableRow>))}{stats.recentLogs.length === 0 && (<TableRow><TableCell colSpan={2} sx={{ color: 'text.secondary', textAlign: 'center', borderColor: 'rgba(255,255,255,0.04)' }}>暂无访问记录</TableCell></TableRow>)}</TableBody></Table></TableContainer>
-        </>)}
+      <Card className="glass-card"><CardContent sx={{ p: 2.5 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 1.5 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>账户统计</Typography>
+          <CalendarTodayIcon sx={{ color: '#00D4FF', fontSize: 18 }} />
+          <Typography variant="body2" sx={{ color: '#00D4FF', fontWeight: 600 }}>{statsLoading ? '...' : stats.activeDays} 天</Typography>
+          <HistoryIcon sx={{ color: '#9B59B6', fontSize: 18 }} />
+          <Typography variant="body2" sx={{ color: '#9B59B6', fontWeight: 600 }}>{statsLoading ? '...' : stats.recentLogs.length} 次登录</Typography>
+        </Box>
+        {!statsLoading && stats.recentLogs.length > 0 && (
+          <TableContainer sx={{ background: 'transparent', maxHeight: 200, '&::-webkit-scrollbar': { width: 4 }, '&::-webkit-scrollbar-thumb': { background: 'rgba(255,255,255,0.1)', borderRadius: 2 } }}>
+            <Table size="small" padding="none"><TableBody>{stats.recentLogs.map((log, i) => (<TableRow key={i}><TableCell sx={{ color: 'text.secondary', borderColor: 'rgba(255,255,255,0.04)', fontSize: '0.75rem', py: 0.3 }}>{log.time}</TableCell><TableCell sx={{ color: 'text.secondary', borderColor: 'rgba(255,255,255,0.04)', fontSize: '0.7rem', fontFamily: 'monospace', py: 0.3, textAlign: 'right' }}>{log.ip}</TableCell></TableRow>))}</TableBody></Table>
+          </TableContainer>
+        )}
       </CardContent></Card>
 
       {/* QQ 第三方账号绑定 */}
