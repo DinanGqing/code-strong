@@ -95,7 +95,7 @@ export default function AIAssistant() {
     <Box
       sx={{
         display: 'flex', flexDirection: 'column',
-        height: '100%',
+        position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
       }}
     >
       {/* 消息列表 — 给底部输入框留空间 */}
