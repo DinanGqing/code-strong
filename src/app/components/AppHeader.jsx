@@ -179,8 +179,8 @@ export default function AppHeader({ user, onLoginClick, onRegisterClick, onLogou
           alignItems: 'center',
           justifyContent: 'space-between',
           px: 2,
-          paddingTop: 'calc(24px + var(--status-bar-height, 24px))',
-          paddingBottom: '12px',
+          paddingTop: 'calc(12px + var(--status-bar-height, 24px))',
+          paddingBottom: '8px',
           background: mode === 'dark' ? '#0d0d2b' : '#ffffff',
           backdropFilter: 'blur(20px)',
           borderBottom: mode === 'dark' ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.06)',
@@ -220,7 +220,7 @@ export default function AppHeader({ user, onLoginClick, onRegisterClick, onLogou
             background: mode === 'dark' ? '#0d0d2b' : '#ffffff',
             backdropFilter: 'blur(20px)',
             borderRight: '1px solid rgba(0,0,0,0.06)',
-            pt: 'calc(24px + var(--status-bar-height, 24px))',
+            pt: 'calc(12px + var(--status-bar-height, 24px))',
           },
         }}
       >
