@@ -75,16 +75,18 @@
 
 html {
   scroll-behavior: smooth;
+  height: 100%;
+  overflow: hidden;
 }
 
 body {
   font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  min-height: 100vh;
+  height: 100%;
+  overflow: hidden;
   padding-top: env(safe-area-inset-top, 0px);
   padding-bottom: env(safe-area-inset-bottom, 0px);
-  overflow-x: hidden;
   transition: background-color 0.3s, color 0.3s;
 }
 

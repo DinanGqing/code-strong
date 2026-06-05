@@ -160,7 +160,7 @@ export default function App() {
   const theme = useTheme();
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden', position: 'relative', bgcolor: theme.palette.mode === 'dark' ? '#0a0a1a' : '#f0f0f0' }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100dvh', overflow: 'hidden', position: 'relative', bgcolor: theme.palette.mode === 'dark' ? '#0a0a1a' : '#f0f0f0' }}>
       {/* 顶部 Header — 聊天详情页隐藏 */}
       {!hideHeader && (
         <AppHeader
