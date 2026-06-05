@@ -180,7 +180,7 @@ export default function App() {
           zIndex: 1,
           bgcolor: theme.palette.mode === 'dark' ? 'transparent' : '#f0f0f0',
           paddingTop: hideHeader ? 0 : 'calc(64px + var(--status-bar-height, 24px))',
-          paddingBottom: '88px',
+          paddingBottom: '60px',
           overflow: 'hidden',
         }}
       >
