@@ -96,7 +96,7 @@ export default function AIAssistant() {
     <Box
       sx={{
         display: 'flex', flexDirection: 'column',
-        height: 'calc(100vh - 60px - 80px - var(--status-bar-height, 24px))',
+        height: '100%',
       }}
     >
       {/* 头部 */}
