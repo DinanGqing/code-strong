@@ -10,7 +10,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import QrCode2Icon from '@mui/icons-material/QrCode2';
 
-const APP_VERSION = '1.1.5';
+const APP_VERSION = '1.1.6';
 const APK_URL = `/download/zhimaquan-v${APP_VERSION}.apk`;
 
 export default function Footer() {

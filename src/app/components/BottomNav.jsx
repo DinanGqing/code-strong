@@ -1,4 +1,5 @@
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Box, BottomNavigation, BottomNavigationAction, useTheme } from '@mui/material';
 import ChatBubbleIcon from '@mui/icons-material/ChatBubble';
 import GroupIcon from '@mui/icons-material/Group';
@@ -24,6 +25,14 @@ export default function BottomNav() {
   const location = useLocation();
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+
+  // 响应 AIAssistant 输入框聚焦/失焦，强制重新渲染
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    const handler = () => forceUpdate((n) => n + 1);
+    window.addEventListener('keyboardStateChange', handler);
+    return () => window.removeEventListener('keyboardStateChange', handler);
+  }, []);
 
   // 判断是否隐藏底部导航
   const shouldHide = HIDE_PATHS.some((re) => re.test(location.pathname))

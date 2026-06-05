@@ -9,11 +9,13 @@ import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CloseIcon from '@mui/icons-material/Close';
 import DownloadIcon from '@mui/icons-material/Download';
+import ChatIcon from '@mui/icons-material/Chat';
 
 const SKILL_CATEGORIES = [
   { id: 1, icon: <AutoFixHighIcon sx={{ fontSize: 40 }} />, name: 'MD → HTML', description: 'Markdown 教程一键转精美网页，深色主题、代码高亮、步骤卡片，自动发布到社区', users: 2, tags: ['Markdown', 'HTML', '教程', '自动化'], color: '#00D4FF', download: '/skills/md-to-page.zip' },
   { id: 2, icon: <AnimationIcon sx={{ fontSize: 40 }} />, name: '卡片追光', description: 'React 卡片鼠标追踪发光 + 3D 倾斜效果，Spotlight 跟随光标，沉浸式交互体验', users: 2, tags: ['React', 'CSS', '动画', '交互'], color: '#9B59B6', download: '/skills/card-glow-tilt.zip' },
   { id: 3, icon: <GridOnIcon sx={{ fontSize: 40 }} />, name: '矩阵背景', description: 'Canvas 黑客矩阵动画背景，字符雨、扫描线、数据脉冲，打造赛博朋克视觉风格', users: 2, tags: ['Canvas', '动画', '黑客', '背景'], color: '#00FF41', download: '/skills/hex-matrix-background.zip' },
+  { id: 4, icon: <ChatIcon sx={{ fontSize: 40 }} />, name: '移动端聊天布局', description: 'React + MUI 移动端聊天页面完整布局方案 — 消息滚动不裁切、输入框键盘适配、导航栏联动隐藏', users: 1, tags: ['React', 'MUI', '聊天', '移动端', '键盘适配'], color: '#FF6B6B', download: '/skills/mobile-chat-layout.zip' },
 ];
 
 function GlowCard({ children, ...props }) {
@@ -54,8 +56,8 @@ export default function Skills() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
+    <Container maxWidth="lg" sx={{ pt: 7, pb: 6 }}>
+      <Box sx={{ textAlign: 'center', mb: 6, pt: 1 }}>
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 2, color: 'text.primary' }}>技能广场</Typography>
         <Typography variant="body1" sx={{ color: 'text.secondary', maxWidth: 600, mx: 'auto' }}>
           探索海量AI技能模板，覆盖代码生成、数据分析、图像处理等数十个领域。点击技能卡片即可本地生成对应代码模板，一键复制使用。

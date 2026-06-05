@@ -42,7 +42,9 @@ export default function AIAssistant() {
     } else {
       document.body.classList.remove('keyboard-open');
     }
-    return () => document.body.classList.remove('keyboard-open');
+    // 通知 BottomNav 重新渲染
+    window.dispatchEvent(new Event('keyboardStateChange'));
+    return () => { document.body.classList.remove('keyboard-open'); window.dispatchEvent(new Event('keyboardStateChange')); };
   }, [focused]);
 
   const handleSend = async () => {
@@ -95,20 +97,19 @@ export default function AIAssistant() {
     <Box
       sx={{
         display: 'flex', flexDirection: 'column',
-        height: '100%',
+        height: '100%', overflow: 'hidden',
       }}
     >
-      {/* 消息列表 */}
+      {/* 消息列表 — flex:1 精确填充输入框上方全部空间，不重叠不切割 */}
       <Box
         ref={listRef}
         sx={{
           flex: 1,
+          minHeight: 0,
           overflowY: 'auto',
-          px: 2, py: 2, pt: 3,
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 2,
-          pb: '68px',
+          px: 2, pb: 2,
+          '& > *:first-of-type': { mt: 7 },
+          '& > * + *': { mt: 2 },
           '&::-webkit-scrollbar': { width: 4 },
           '&::-webkit-scrollbar-thumb': { background: 'rgba(0,212,255,0.3)', borderRadius: 2 },
         }}
@@ -160,19 +161,21 @@ export default function AIAssistant() {
         )}
       </Box>
 
-      {/* 输入框 — 固定于底部导航栏正上方 */}
+      {/* 输入框 — 正常流内，底部留出导航栏空间 */}
       <Box
         sx={{
-          position: 'fixed',
-          bottom: '76px',
-          left: 0, right: 0,
-          px: 2, py: 1.5,
+          flexShrink: 0,
           borderTop: '1px solid rgba(0,0,0,0.06)',
           background: isDark ? 'rgba(10, 10, 26, 0.95)' : '#ffffff',
           backdropFilter: 'blur(20px)',
-          zIndex: 100,
         }}
       >
+        <Box
+          sx={{
+            px: 2, py: 1.5,
+            pb: focused ? '8px' : '56px',
+          }}
+        >
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'flex-end' }}>
           <TextField
             fullWidth
@@ -211,6 +214,7 @@ export default function AIAssistant() {
             <SendIcon />
           </IconButton>
         </Box>
+      </Box>
       </Box>
     </Box>
   );

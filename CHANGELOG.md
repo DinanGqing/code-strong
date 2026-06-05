@@ -5,6 +5,24 @@
 
 ---
 
+## [1.1.6] - 2026-06-06
+
+### 🛠 修复 (Fixed)
+
+- **AI 助手聊天页全面布局修复**
+  - 滚动区域重构：输入框从 `position: fixed` 改为正常流 flex 布局，消息列表 `flex: 1 + minHeight: 0` 精确填充，滚动不再切割顶部/底部消息
+  - 欢迎语顶部裁切：移除 `display: flex + gap` 布局（overflow: auto 中 padding 被吃），改用普通 block + `margin-top` 确保间距始终有效
+  - 底部灰边消除：输入框背景色从内层移到外层 wrapper，覆盖到导航栏上方不留灰缝
+  - 键盘适配：输入框聚焦时底部间距 76px → 8px，贴合输入法键盘
+  - 导航栏联动隐藏：修复 `keyboard-open` class 变更不触发 React 重渲染的 Bug，通过自定义事件 + forceUpdate 实现输入时导航栏消失
+
+### 🔄 变更 (Changed)
+
+- 技能广场标题顶部间距优化（64px）
+- APK 部署技能序列号改为动态获取（`adb devices`）
+
+---
+
 ## [1.1.5] - 2026-06-04
 
 ### ✨ 新增 (Added)
